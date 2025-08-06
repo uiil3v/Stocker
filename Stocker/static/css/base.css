@@ -47,7 +47,7 @@ body{
 .top-side .side-bar a h4 {
     margin-bottom: 50px;
     font-size: 25px;
-    font-weight: 1000;
+    /* font-weight: ; */
     margin-left: 20px;
     margin-right: 20px;
     transition: 0.4s;
