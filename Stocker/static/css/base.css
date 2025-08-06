@@ -24,7 +24,7 @@ body{
 /* Side Bar */
 
 .top-side .side-bar{
-    background-color: rgb(240, 240, 240);
+    background: linear-gradient(to bottom, rgb(238, 238, 238), white);
     width: 230px;
     height: 100%;
     display: flex;
