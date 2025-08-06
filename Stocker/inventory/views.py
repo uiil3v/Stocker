@@ -13,7 +13,7 @@ def is_admin(user):
 # -------------------
 
 def dashboard_view(request):
-    return render(request, "base.html")
+    return render(request, "inventory/dashboard.html")
 
 @login_required
 def product_list(request):

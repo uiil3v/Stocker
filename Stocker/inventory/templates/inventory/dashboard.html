@@ -1,13 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
 
-    hello dash
-    
-</body>
-</html>
+{% block title %}Dashboard{% endblock %}
+
+{% block fileStyle %} 
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+
+
+{% endblock %}

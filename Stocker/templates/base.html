@@ -39,51 +39,65 @@
             <a href="#" class="nav-link-setting"><i class="fas fa-cog"></i><span>Settings</span></a>
         </div>
 
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="left d-flex flex-row">
-                <!-- زر الهامبرقر (يظهر فقط في الشاشات الصغيرة) -->
-                <button class="btn d-md-none" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#sidebarOffcanvas">
-                    <i class="fas fa-bars fs-3"></i>
-                </button>
-                <form action="">
-                    <input type="search" placeholder="Search...">
-                </form>
-            </div>
-            <!-- Offcanvas Sidebar -->
-            <div class="offcanvas offcanvas-start custom-offcanvas" tabindex="-1" id="sidebarOffcanvas">
-                <div class="offcanvas-header border-bottom">
-                    <h5 class="offcanvas-title fw-bold fs-2">Inventory Plus</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+
+
+        <div class="right-father d-flex flex-column">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="left d-flex flex-row">
+                    <!-- زر الهامبرقر (يظهر فقط في الشاشات الصغيرة) -->
+                    <button class="btn d-md-none" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#sidebarOffcanvas">
+                        <i class="fas fa-bars fs-3"></i>
+                    </button>
+                    <form action="">
+                        <input type="search" placeholder="Search...">
+                    </form>
                 </div>
-                <div class="offcanvas-body d-flex flex-column justify-content-between">
-                    <nav class="d-flex flex-column gap-2">
-                        <a href="#" class="nav-link fs-4"><i class="fas fa-box me-2"></i> Products</a>
-                        <a href="#" class="nav-link fs-4"><i class="fas fa-tags me-2"></i> Categories</a>
-                        <a href="#" class="nav-link fs-4"><i class="fas fa-truck me-2"></i> Suppliers</a>
-                        <a href="#" class="nav-link fs-4"><i class="fas fa-warehouse me-2"></i> Stock</a>
-                        <a href="#" class="nav-link fs-4"><i class="fas fa-chart-line me-2"></i> Reports</a>
-                    </nav>
-                    <div>
-                        <hr>
-                        <a href="#" class="nav-link fs-4"><i class="fas fa-cog me-2"></i> Settings</a>
+                <!-- Offcanvas Sidebar -->
+                <div class="offcanvas offcanvas-start custom-offcanvas" tabindex="-1" id="sidebarOffcanvas">
+                    <div class="offcanvas-header border-bottom">
+                        <h5 class="offcanvas-title fw-bold fs-2">Inventory Plus</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body d-flex flex-column justify-content-between">
+                        <nav class="d-flex flex-column gap-2">
+                            <a href="#" class="nav-link fs-4"><i class="fas fa-box me-2"></i> Products</a>
+                            <a href="#" class="nav-link fs-4"><i class="fas fa-tags me-2"></i> Categories</a>
+                            <a href="#" class="nav-link fs-4"><i class="fas fa-truck me-2"></i> Suppliers</a>
+                            <a href="#" class="nav-link fs-4"><i class="fas fa-warehouse me-2"></i> Stock</a>
+                            <a href="#" class="nav-link fs-4"><i class="fas fa-chart-line me-2"></i> Reports</a>
+                        </nav>
+                        <div>
+                            <hr>
+                            <a href="#" class="nav-link fs-4"><i class="fas fa-cog me-2"></i> Settings</a>
+                        </div>
                     </div>
                 </div>
+
+
+
+                <div class="right">
+                    <a href="#" class="text-dark fs-3">
+                        <i class="fas fa-bell"></i>
+                    </a>
+                    <a href="#" class="text-dark fs-3 ">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                </div>
             </div>
+            <main style="flex: 1; overflow: hidden;">
+                {% block content %}
 
+                {% endblock %}
+            </main>
 
-
-            <div class="right">
-                <a href="#" class="text-dark fs-3">
-                    <i class="fas fa-bell"></i>
-                </a>
-                <a href="#" class="text-dark fs-3 ">
-                    <i class="fas fa-user-circle"></i>
-                </a>
-            </div>
         </div>
+
     </div>
+
+
+
 
 
 </body>
