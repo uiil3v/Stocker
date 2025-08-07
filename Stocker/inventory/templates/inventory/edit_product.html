@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Add Product{% endblock %}
+{% block title %}Edit Product{% endblock %}
 
 {% block fileStyle %}
 <link rel="stylesheet" href="{% static 'css/add_product.css' %}">
@@ -10,7 +10,7 @@
 {% block content %}
 <div class="container my-5 p-5 rounded-4 ">
 
-    <h2 class="text-center fw-bold mb-5">Add New Product</h2>
+    <h2 class="text-center fw-bold mb-5">Edit Product</h2>
 
     {% if messages %}
     {% for message in messages %}
@@ -31,7 +31,7 @@
         <div class="col-12">
             <label for="id_name" class="form-label text-uppercase small fw-bold">Product Name</label>
             <input type="text" name="name" id="id_name" class="form-control bg-light rounded-3 border-0 p-3"
-                placeholder="Enter product name" required>
+                placeholder="Enter product name" value="{{ form.instance.name }}" required>
             {% if form.name.errors %}
             <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
             {% endif %}
@@ -42,7 +42,7 @@
             <label for="id_category" class="form-label text-uppercase small fw-bold">Category</label>
             <select name="category" id="id_category" class="form-select bg-light rounded-3 border-0 p-3" required>
                 {% for key, label in form.fields.category.choices %}
-                <option value="{{ key }}">{{ label }}</option>
+                <option value="{{ key }}" {% if form.instance.category == key %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
             {% if form.category.errors %}
@@ -50,9 +50,16 @@
             {% endif %}
         </div>
 
+
         <div class="col-12">
-            <label for="id_image" class="form-label text-uppercase small fw-bold">Product Image</label>
-            <input type="file" name="image" id="id_image" class="form-control bg-light rounded-3 border-0 p-3" required>
+            <label class="form-label text-uppercase small fw-bold d-block">Current Product Image</label>
+            <div class="text-start mb-2">
+                <img src="{{ form.instance.image.url }}" alt="Product Image" class="img-thumbnail"
+                    style="max-width: 170px; max-height: 200px; object-fit: contain;">
+            </div>
+
+            <label for="id_image" class="form-label text-uppercase small fw-bold">Change Image</label>
+            <input type="file" name="image" id="id_image" class="form-control bg-light rounded-3 border-0 p-3">
             {% if form.image.errors %}
             <div class="text-danger small mt-1">{{ form.image.errors.0 }}</div>
             {% endif %}
@@ -61,7 +68,8 @@
         <div class="col-12">
             <label for="id_quantity_in_stock" class="form-label text-uppercase small fw-bold">Stock Quantity</label>
             <input type="number" name="quantity_in_stock" id="id_quantity_in_stock"
-                class="form-control bg-light rounded-3 border-0 p-3" placeholder="Enter quantity" required>
+                class="form-control bg-light rounded-3 border-0 p-3" placeholder="Enter quantity"
+                value="{{ form.instance.quantity_in_stock }}" required>
             {% if form.quantity_in_stock.errors %}
             <div class="text-danger small mt-1">{{ form.quantity_in_stock.errors.0 }}</div>
             {% endif %}
@@ -70,7 +78,8 @@
         <div class="col-12">
             <label for="id_description" class="form-label text-uppercase small fw-bold">Description</label>
             <textarea name="description" id="id_description" rows="4"
-                class="form-control bg-light rounded-3 border-0 p-3" placeholder="Enter product description" required></textarea>
+                class="form-control bg-light rounded-3 border-0 p-3" placeholder="Enter product description"
+                required>{{ form.instance.description }}</textarea>
             {% if form.description.errors %}
             <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
             {% endif %}
@@ -79,7 +88,8 @@
         <div class="col-12">
             <label for="id_expiry_date" class="form-label text-uppercase small fw-bold">Expiry Date</label>
             <input type="date" name="expiry_date" id="id_expiry_date"
-                class="form-control bg-light rounded-3 border-0 p-3" required>
+                class="form-control bg-light rounded-3 border-0 p-3"
+                value="{{ form.instance.expiry_date|date:'Y-m-d' }}" required>
             {% if form.expiry_date.errors %}
             <div class="text-danger small mt-1">{{ form.expiry_date.errors.0 }}</div>
             {% endif %}
@@ -87,9 +97,12 @@
 
         <div class="col-12">
             <label for="id_suppliers" class="form-label text-uppercase small fw-bold">Suppliers</label>
-            <select name="suppliers" id="id_suppliers" multiple class="form-select bg-light rounded-3 border-0 p-3" required>
+            <select name="suppliers" id="id_suppliers" multiple class="form-select bg-light rounded-3 border-0 p-3"
+                required>
                 {% for supplier in form.fields.suppliers.queryset %}
-                <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                <option value="{{ supplier.id }}" {% if supplier in form.instance.suppliers.all %}selected{% endif %}>
+                    {{ supplier.name }}
+                </option>
                 {% endfor %}
             </select>
             {% if form.suppliers.errors %}
@@ -100,7 +113,7 @@
 
         <div class="col-12 text-center mt-4">
             <button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-bold fs-5">
-                Submit <span class="ms-2">&rarr;</span>
+                Save Changes <span class="ms-2">&rarr;</span>
             </button>
         </div>
 

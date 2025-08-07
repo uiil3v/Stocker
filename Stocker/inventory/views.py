@@ -46,6 +46,33 @@ def add_product_view(request: HttpRequest):
         form = ProductForm()
     return render(request, "inventory/add_product.html", {"form": form})
 
+def edit_product_view(request: HttpRequest, product_id: int):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Product updated successfully.")
+                return redirect("inventory:dashboard_view")  # غيّرها إذا عندك صفحة products
+            except Exception as e:
+                print("❌ Error during form.save():", e)
+                return render(request, "inventory/edit_product.html", {
+                    "form": form,
+                    "error": f"Something went wrong: {str(e)}"
+                })
+        else:
+            print("❌ Form validation errors:", form.errors)
+            return render(request, "inventory/edit_product.html", {
+                "form": form,
+                "error": "Form validation failed. Please check your inputs."
+            })
+
+    else:
+        form = ProductForm(instance=product)
+        return render(request, "inventory/edit_product.html", {"form": form, "product": product})
+
 @login_required
 def product_list(request):
     return render(request, 'inventory/product_list.html')
