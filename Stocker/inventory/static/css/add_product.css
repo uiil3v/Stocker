@@ -1,0 +1,7 @@
+input.form-control:focus,
+select.form-select:focus,
+textarea.form-control:focus {
+  border: 2px solid #247564 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}

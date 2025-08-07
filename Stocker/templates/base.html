@@ -23,10 +23,10 @@
     <div class="top-side">
 
         <!-- Side Bar -->
-        <div class="side-bar">
+        <div class="side-bar position-sticky">
             <nav>
                 <a href="">
-                    <h4>Inventory Plus</h4>
+                    <h4>Inventory<i class="fas fa-cubes me-2"></i> Plus</h4>
                 </a>
                 <a href="#" class="nav-link"><i class="fas fa-box"></i><span>Products</span></a>
                 <a href="#" class="nav-link"><i class="fas fa-tags"></i><span>Categories</span></a>
@@ -41,15 +41,16 @@
 
         <div class="right-father d-flex flex-column">
             <!-- Top Bar -->
-            <div class="top-bar">
+            <div class="top-bar position-sticky">
                 <div class="left d-flex flex-row">
-                    <!-- زر الهامبرقر (يظهر فقط في الشاشات الصغيرة) -->
                     <button class="btn d-md-none" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#sidebarOffcanvas">
                         <i class="fas fa-bars fs-3"></i>
                     </button>
                     <form action="">
-                        <input type="search" placeholder="Search...">
+                        <input type="search" placeholder="Search Products...">
+                        <i style="position: absolute; right: 15px; top: 12px; color: rgb(181, 180, 180);"
+                            class="fa-solid fa-magnifying-glass"></i>
                     </form>
                 </div>
                 <!-- Offcanvas Sidebar -->
@@ -84,7 +85,7 @@
                     </a>
                 </div>
             </div>
-            <main style="flex: 1; ">
+            <main style="flex: 1; overflow-x: hidden;">
                 {% block content %}
 
                 {% endblock %}

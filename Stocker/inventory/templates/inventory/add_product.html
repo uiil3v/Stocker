@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Product{% endblock %}
+
+{% block fileStyle %}
+<link rel="stylesheet" href="{% static 'css/add_product.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5 p-5 rounded-4 ">
+
+    <h2 class="text-center fw-bold mb-5">Add New Product</h2>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="row g-4">
+        {% csrf_token %}
+
+        <div class="col-12">
+            <label for="id_name" class="form-label text-uppercase small fw-bold">Product Name</label>
+            <input type="text" name="name" id="id_name" class="form-control bg-light rounded-3 border-0 p-3"
+                placeholder="Enter product name" required>
+            {% if form.name.errors %}
+            <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            <label for="id_price" class="form-label text-uppercase small fw-bold">Price</label>
+            <input type="number" name="price" id="id_price" class="form-control bg-light rounded-3 border-0 p-3"
+                placeholder="Enter price" required>
+            {% if form.price.errors %}
+            <div class="text-danger small mt-1">{{ form.price.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            <label for="id_category" class="form-label text-uppercase small fw-bold">Category</label>
+            <select name="category" id="id_category" class="form-select bg-light rounded-3 border-0 p-3" required>
+                {% for key, label in form.fields.category.choices %}
+                <option value="{{ key }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+            {% if form.category.errors %}
+            <div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-12">
+            <label for="id_brand" class="form-label text-uppercase small fw-bold">Product Brand</label>
+            <input type="text" name="brand" id="id_brand" class="form-control bg-light rounded-3 border-0 p-3"
+                placeholder="Enter product brand" required>
+            {% if form.brand.errors %}
+            <div class="text-danger small mt-1">{{ form.brand.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-12">
+            <label for="id_image" class="form-label text-uppercase small fw-bold">Product Image</label>
+            <input type="file" name="image" id="id_image" class="form-control bg-light rounded-3 border-0 p-3" required>
+            {% if form.image.errors %}
+            <div class="text-danger small mt-1">{{ form.image.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-12">
+            <label for="id_quantity_in_stock" class="form-label text-uppercase small fw-bold">Stock Quantity</label>
+            <input type="number" name="quantity_in_stock" id="id_quantity_in_stock"
+                class="form-control bg-light rounded-3 border-0 p-3" placeholder="Enter quantity" required>
+            {% if form.quantity_in_stock.errors %}
+            <div class="text-danger small mt-1">{{ form.quantity_in_stock.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-12">
+            <label for="id_description" class="form-label text-uppercase small fw-bold">Description</label>
+            <textarea name="description" id="id_description" rows="4"
+                class="form-control bg-light rounded-3 border-0 p-3" placeholder="Enter product description" required></textarea>
+            {% if form.description.errors %}
+            <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-12">
+            <label for="id_expiry_date" class="form-label text-uppercase small fw-bold">Expiry Date</label>
+            <input type="date" name="expiry_date" id="id_expiry_date"
+                class="form-control bg-light rounded-3 border-0 p-3" required>
+            {% if form.expiry_date.errors %}
+            <div class="text-danger small mt-1">{{ form.expiry_date.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-12">
+            <label for="id_suppliers" class="form-label text-uppercase small fw-bold">Suppliers</label>
+            <select name="suppliers" id="id_suppliers" multiple class="form-select bg-light rounded-3 border-0 p-3" required>
+                {% for supplier in form.fields.suppliers.queryset %}
+                <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                {% endfor %}
+            </select>
+            {% if form.suppliers.errors %}
+            <div class="text-danger small mt-1">{{ form.suppliers.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted">Hold Ctrl (Windows) or ⌘ (Mac) to select multiple suppliers</small>
+        </div>
+
+        <div class="col-12 text-center mt-4">
+            <button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-bold fs-5">
+                Submit <span class="ms-2">&rarr;</span>
+            </button>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

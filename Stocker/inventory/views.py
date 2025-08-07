@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
 from .models import Product, Category, Supplier
+from .forms import ProductForm
 from django.http import HttpResponse
 import csv
 
@@ -15,6 +18,34 @@ def is_admin(user):
 def dashboard_view(request):
     return render(request, "inventory/dashboard.html")
 
+
+
+# @user_passes_test(is_admin)
+# @login_required
+def add_product_view(request: HttpRequest):
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Product added successfully.")
+                return redirect("inventory:dashboard_view")  
+            except Exception as e:
+                print("❌ Error during form.save():", e)
+                return render(request, "inventory/add_product.html", {
+                    "form": form,
+                    "error": f"Something went wrong: {str(e)}"
+                })
+        else:
+            print("❌ Form validation errors:", form.errors)
+            return render(request, "inventory/add_product.html", {
+                "form": form,
+                "error": "Form validation failed. Please check your inputs."
+            })
+    else:
+        form = ProductForm()
+    return render(request, "inventory/add_product.html", {"form": form})
+
 @login_required
 def product_list(request):
     return render(request, 'inventory/product_list.html')
@@ -23,10 +54,6 @@ def product_list(request):
 def product_detail(request, product_id):
     return render(request, 'inventory/product_detail.html')
 
-@login_required
-@user_passes_test(is_admin)
-def product_add(request):
-    return render(request, 'inventory/product_form.html')
 
 @login_required
 def product_edit(request, product_id):

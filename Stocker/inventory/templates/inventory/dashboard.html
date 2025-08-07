@@ -3,174 +3,25 @@
 
 {% block title %}Dashboard{% endblock %}
 
-{% block fileStyle %} 
+{% block fileStyle %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-<style>
-/* ===== Color Variables ===== */
-:root {
-    --primary-color: #2563eb;
-    --success-color: #16a34a;
-    --info-color: #0891b2;
-    --danger-color: #dc2626;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
-}
 
-/* ===== General Layout ===== */
-body {
-    background-color: var(--gray-50);
-    font-family: 'Inter', sans-serif;
-}
-
-.container-fluid {
-    padding: 2rem;
-}
-
-.dashboard-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--gray-800));
-    color: white;
-    border-radius: 12px;
-    padding: 2rem;
-    text-align: center;
-    margin-bottom: 2.5rem;
-}
-
-.dashboard-header h2 {
-    font-weight: 700;
-    font-size: 2rem;
-    margin: 0;
-}
-
-/* ===== Stats Cards ===== */
-.stats-card {
-    background: white;
-    border-left: 4px solid;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: var(--shadow);
-    transition: transform 0.3s ease;
-    height: 140px;
-}
-
-.stats-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-}
-
-.stats-card.primary { border-left-color: var(--primary-color); }
-.stats-card.success { border-left-color: var(--success-color); }
-.stats-card.info    { border-left-color: var(--info-color); }
-.stats-card.danger  { border-left-color: var(--danger-color); }
-
-.stats-icon {
-    width: 55px;
-    height: 55px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-}
-
-.primary .stats-icon { background: rgba(37, 99, 235, 0.1); color: var(--primary-color); }
-.success .stats-icon { background: rgba(22, 163, 74, 0.1); color: var(--success-color); }
-.info .stats-icon    { background: rgba(8, 145, 178, 0.1); color: var(--info-color); }
-.danger .stats-icon  { background: rgba(220, 38, 38, 0.1); color: var(--danger-color); }
-
-.stats-label {
-    font-size: 0.9rem;
-    color: var(--gray-600);
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.stats-number {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--gray-800);
-}
-
-/* ===== Table ===== */
-.table-container {
-    background: white;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    margin-top: 2rem;
-}
-
-.table-header {
-    background: linear-gradient(135deg, var(--gray-800), var(--gray-700));
-    color: white;
-    padding: 1.2rem 2rem;
-    font-weight: 700;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.custom-table thead th {
-    background: var(--gray-100);
-    color: var(--gray-700);
-    border: none;
-    padding: 1rem;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-}
-
-.custom-table tbody td {
-    padding: 1rem;
-    color: var(--gray-700);
-}
-
-.badge-custom {
-    padding: 5px 10px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 6px;
-}
-
-.badge-secondary {
-    background: var(--gray-100);
-    color: var(--gray-700);
-}
-
-.badge-danger {
-    background: rgba(220, 38, 38, 0.1);
-    color: var(--danger-color);
-}
-
-/* ===== Empty State ===== */
-.empty-state {
-    padding: 3rem;
-    text-align: center;
-    color: var(--gray-600);
-}
-
-.empty-state-icon {
-    background: var(--success-color);
-    color: white;
-    width: 70px;
-    height: 70px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto 1rem;
-    border-radius: 50%;
-    font-size: 1.8rem;
-}
-</style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid p-5">
+
+
+    {% if messages %}
+    <div class="container mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Header -->
     <div class="dashboard-header">
@@ -264,25 +115,25 @@ body {
 </div>
 
 <script>
-// Animate numbers
-document.addEventListener('DOMContentLoaded', function () {
-    const counters = document.querySelectorAll('.counter-animation');
-    counters.forEach(counter => {
-        const target = parseInt(counter.innerText);
-        let current = 0;
-        const step = Math.ceil(target / 30);
+    // Animate numbers
+    document.addEventListener('DOMContentLoaded', function () {
+        const counters = document.querySelectorAll('.counter-animation');
+        counters.forEach(counter => {
+            const target = parseInt(counter.innerText);
+            let current = 0;
+            const step = Math.ceil(target / 30);
 
-        const interval = setInterval(() => {
-            current += step;
-            if (current >= target) {
-                counter.innerText = target;
-                clearInterval(interval);
-            } else {
-                counter.innerText = current;
-            }
-        }, 30);
+            const interval = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    counter.innerText = target;
+                    clearInterval(interval);
+                } else {
+                    counter.innerText = current;
+                }
+            }, 30);
+        });
     });
-});
 </script>
 
 {% endblock %}

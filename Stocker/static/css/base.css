@@ -8,10 +8,28 @@
     box-sizing: border-box;
 }
 
+/* Colors */
+:root {
+    --primary-color: #2563eb;
+    --success-color: #16a34a;
+    --info-color: #0891b2;
+    --danger-color: #dc2626;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
+}
+
 body{
     min-height: 100vh;
     font-family: "Arimo", sans-serif;
 }
+
+
 
 .top-side{
     height: 100vh;
@@ -46,14 +64,19 @@ body{
 
 .top-side .side-bar a h4 {
     margin-bottom: 50px;
-    font-size: 25px;
-    /* font-weight: ; */
+    font-size: 37px;
     margin-left: 20px;
     margin-right: 20px;
     transition: 0.4s;
     text-align: center;
     font-family: "Archivo Black", sans-serif;
-    text-shadow: #333;
+    text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+    color: #314e47;
+}
+
+.top-side .side-bar a h4 .fa-cubes {
+    color: #538076;
+    
 }
 
 .top-side .side-bar a h4:hover{
@@ -68,14 +91,14 @@ body{
     padding: 10px 10px;
     display: flex;
     align-items: center;
-    color: #333;
+    color: #314e47;
     width: 80%;
     margin-left: 20px;
 
 }
 
 .top-side .side-bar .nav-link:hover{
-    background-color: #d1ebe6;
+    background-color: #ddeeea;
     border-radius: 8px;
 }
 
@@ -95,14 +118,14 @@ body{
     padding: 12px 10px;
     display: flex;
     align-items: center;
-    color: #333;
+    color: #314e47;
     margin-left: 20px;
     width: 80%;
     transition: 0.4s;
 }
 
 .top-side .side-bar .nav-link-setting:hover{
-    background-color: #d1ebe6;
+    background-color: #ddeeea;
     border-radius: 8px;
 }
 
@@ -128,11 +151,12 @@ body{
 .top-side .top-bar .left form{
     width: 100%;
     max-width: 500px;
+    position: relative;
 }
 
 .top-side .top-bar .left form input{
     border-radius: 13px;
-    border: 1px solid lightgray;
+    border: 1px solid #314e4761;
     height: 38px;
     width: 100%;
     padding-left: 20px;
@@ -154,10 +178,11 @@ body{
 
 .top-side .top-bar .right .fas{
     transition: 0.3s;
+    color: #256a5d;
 }
 
 .top-side .top-bar .right .fas:hover{
-    color: #396d63;
+    color: #0c352d;
 }
 
 
