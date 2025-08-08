@@ -73,6 +73,17 @@ def edit_product_view(request: HttpRequest, product_id: int):
         form = ProductForm(instance=product)
         return render(request, "inventory/edit_product.html", {"form": form, "product": product})
 
+def delete_product_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+        product.delete()
+        messages.success(request, "Product deleted successfully.")
+        return redirect("inventory:dashboard_view") 
+
+    return redirect("inventory:edit_product_view", product_id=product_id)
+
+
 @login_required
 def product_list(request):
     return render(request, 'inventory/product_list.html')
