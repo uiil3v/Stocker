@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Stock{% endblock %}
+
+{% block fileStyle %}
+<link rel="stylesheet" href="{% static 'css/add_product.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5 p-5 rounded-4">
+
+    <h2 class="text-center fw-bold mb-4">Update Stock Quantity</h2>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Product:</label>
+                <p class="form-control bg-light">{{ product.name }}</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Current Quantity:</label>
+                <p class="form-control bg-light">{{ product.quantity_in_stock }}</p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-4">
+                    <label for="quantity" class="form-label fw-bold">New Quantity</label>
+                    <input type="number" name="quantity" id="quantity" min="0" class="form-control bg-light rounded-3 border-0 p-3" required>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-bold fs-5">
+                        Update Stock <span class="ms-2">&rarr;</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

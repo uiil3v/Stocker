@@ -251,14 +251,35 @@ def delete_supplier_view(request, supplier_id):
 # Stock Views
 # -------------------
 
-@login_required
-def stock_update(request, product_id):
-    return render(request, 'inventory/stock_update.html')
+def stock_status_view(request):
+    products = Product.objects.all().order_by('name')
+    
+    return render(request, 'inventory/stock_status.html', {
+        'products': products
+    })
 
-@login_required
-def stock_status(request):
-    return render(request, 'inventory/stock_status.html')
 
+def stock_update_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == 'POST':
+        new_quantity = request.POST.get('quantity')
+        try:
+            new_quantity = int(new_quantity)
+            if new_quantity < 0:
+                raise ValueError("Quantity can't be negative.")
+
+            product.quantity_in_stock = new_quantity
+            product.save()
+            messages.success(request, "Stock quantity updated successfully.")
+            return redirect('inventory:stock_status_view')
+
+        except ValueError:
+            messages.error(request, "Please enter a valid positive number.")
+    
+    return render(request, 'inventory/stock_update.html', {
+        'product': product
+    })
 # -------------------
 # Search Views
 # -------------------
