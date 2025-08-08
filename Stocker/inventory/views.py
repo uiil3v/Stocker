@@ -3,8 +3,11 @@ from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Product, Category, Supplier
-from .forms import ProductForm
+from .forms import ProductForm, CategoryForm
 from django.http import HttpResponse
+from django.db.models import Q
+from django.core.paginator import Paginator
+
 import csv
 
 # صلاحيات المسؤول
@@ -18,6 +21,45 @@ def is_admin(user):
 def dashboard_view(request):
     return render(request, "inventory/dashboard.html")
 
+def products_list_view(request):
+    products = Product.objects.all().order_by("-created_at")
+
+    # الفلاتر
+    search_query = request.GET.get("search")
+    category_filter = request.GET.get("category")
+    supplier_filter = request.GET.get("supplier")
+
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+
+    if category_filter:
+        products = products.filter(category=category_filter)
+
+    if supplier_filter:
+        products = products.filter(suppliers__id=supplier_filter)
+
+
+    paginator = Paginator(products, 9) 
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    
+    categories = Category.objects.all()
+    suppliers = Supplier.objects.all()
+
+    context = {
+        "products": page_obj,
+        "categories": categories,
+        "suppliers": suppliers,
+        "search_query": search_query,
+        "selected_category": category_filter,
+        "selected_supplier": supplier_filter,
+    }
+
+    return render(request, "inventory/products_list.html", context)
 
 
 # @user_passes_test(is_admin)
@@ -46,6 +88,8 @@ def add_product_view(request: HttpRequest):
         form = ProductForm()
     return render(request, "inventory/add_product.html", {"form": form})
 
+
+
 def edit_product_view(request: HttpRequest, product_id: int):
     product = get_object_or_404(Product, id=product_id)
 
@@ -73,6 +117,8 @@ def edit_product_view(request: HttpRequest, product_id: int):
         form = ProductForm(instance=product)
         return render(request, "inventory/edit_product.html", {"form": form, "product": product})
 
+
+
 def delete_product_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
@@ -85,17 +131,8 @@ def delete_product_view(request, product_id):
 
 
 @login_required
-def product_list(request):
-    return render(request, 'inventory/product_list.html')
-
-@login_required
 def product_detail(request, product_id):
     return render(request, 'inventory/product_detail.html')
-
-
-@login_required
-def product_edit(request, product_id):
-    return render(request, 'inventory/product_form.html')
 
 @login_required
 @user_passes_test(is_admin)
@@ -106,25 +143,16 @@ def product_delete(request, product_id):
 # Category Views
 # -------------------
 
-@login_required
-@user_passes_test(is_admin)
-def category_list(request):
-    return render(request, 'inventory/category_list.html')
-
-@login_required
-@user_passes_test(is_admin)
-def category_add(request):
-    return render(request, 'inventory/category_form.html')
-
-@login_required
-@user_passes_test(is_admin)
-def category_edit(request, category_id):
-    return render(request, 'inventory/category_form.html')
-
-@login_required
-@user_passes_test(is_admin)
-def category_delete(request, category_id):
-    return redirect('inventory:category_list')
+def add_category(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Category added successfully.")
+            return redirect('inventory:dashboard_view')  
+    else:
+        form = CategoryForm()
+    return render(request, 'inventory/add_category.html', {'form': form})
 
 # -------------------
 # Supplier Views

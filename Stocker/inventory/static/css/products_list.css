@@ -1,0 +1,24 @@
+/* تركيز الحقول داخل نموذج الفلترة */
+form input:focus,
+form select:focus {
+  border-color: #247564 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* أزرار الترقيم */
+.pagination .page-link {
+  color: #247564;
+}
+
+.pagination .page-link:hover {
+  color: #fff;
+  background-color: #000;
+  border-color: #247564;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #000;
+  border-color: #000;
+  color: #fff;
+}
