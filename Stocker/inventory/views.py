@@ -3,7 +3,7 @@ from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Product, Category, Supplier
-from .forms import ProductForm, CategoryForm
+from .forms import ProductForm, CategoryForm, SupplierForm
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
@@ -130,18 +130,17 @@ def delete_product_view(request, product_id):
     return redirect("inventory:edit_product_view", product_id=product_id)
 
 
-@login_required
-def product_detail(request, product_id):
-    return render(request, 'inventory/product_detail.html')
-
-@login_required
-@user_passes_test(is_admin)
-def product_delete(request, product_id):
-    return redirect('inventory:product_list')
 
 # -------------------
 # Category Views
 # -------------------
+
+
+def category_list(request):
+    categories = Category.objects.all().order_by('name')  
+    return render(request, 'inventory/category_list.html', {'categories': categories})
+
+
 
 def add_category(request):
     if request.method == 'POST':
@@ -153,6 +152,7 @@ def add_category(request):
     else:
         form = CategoryForm()
     return render(request, 'inventory/add_category.html', {'form': form})
+
 
 
 def edit_category(request, category_id):
@@ -173,6 +173,7 @@ def edit_category(request, category_id):
     })
     
     
+    
 def delete_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
 
@@ -184,37 +185,67 @@ def delete_category(request, category_id):
     return render(request, 'inventory/delete_category_confirm.html', {'category': category})
 
 
-def category_list(request):
-    categories = Category.objects.all().order_by('name')  
-    return render(request, 'inventory/category_list.html', {'categories': categories})
+
 # -------------------
 # Supplier Views
 # -------------------
 
-@login_required
-@user_passes_test(is_admin)
-def supplier_list(request):
-    return render(request, 'inventory/supplier_list.html')
 
-@login_required
-@user_passes_test(is_admin)
-def supplier_detail(request, supplier_id):
-    return render(request, 'inventory/supplier_detail.html')
+def supplier_list_view(request):
+    suppliers = Supplier.objects.all().order_by('name')
+    return render(request, 'inventory/supplier_list.html', {'suppliers': suppliers})
 
-@login_required
-@user_passes_test(is_admin)
-def supplier_add(request):
-    return render(request, 'inventory/supplier_form.html')
 
-@login_required
-@user_passes_test(is_admin)
-def supplier_edit(request, supplier_id):
-    return render(request, 'inventory/supplier_form.html')
+def add_supplier_view(request):
+    if request.method == 'POST':
+        form = SupplierForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Supplier added successfully.")
+            return redirect('inventory:dashboard_view')  
+        else:
+            messages.error(request, "Form is invalid. Please correct the errors.")
+    else:
+        form = SupplierForm()
+    
+    return render(request, 'inventory/add_supplier.html', {'form': form})
 
-@login_required
-@user_passes_test(is_admin)
-def supplier_delete(request, supplier_id):
-    return redirect('inventory:supplier_list')
+
+def edit_supplier_view(request, supplier_id):
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+
+    if request.method == 'POST':
+        form = SupplierForm(request.POST, request.FILES, instance=supplier)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Supplier updated successfully.")
+            return redirect('inventory:dashboard_view')
+        else:
+            messages.error(request, "Form is invalid. Please correct the errors.")
+    else:
+        form = SupplierForm(instance=supplier)
+
+    return render(request, 'inventory/edit_supplier.html', {
+        'form': form,
+        'supplier': supplier,
+    })
+    
+    
+def is_admin(user):
+    return user.is_superuser
+
+
+def delete_supplier_view(request, supplier_id):
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+
+    if request.method == 'POST':
+        supplier.delete()
+        messages.success(request, "Supplier deleted successfully.")
+        return redirect('inventory:dashboard_view')
+
+    return render(request, 'inventory/delete_supplier_confirm.html', {'supplier': supplier})
+
+
 
 # -------------------
 # Stock Views

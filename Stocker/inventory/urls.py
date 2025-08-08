@@ -20,4 +20,11 @@ urlpatterns = [
     path("edit_category/<int:category_id>/", views.edit_category, name="edit_category"),
     path("delete_category/<int:category_id>/", views.delete_category, name="delete_category"),
     
+        # Supplier URLs
+    path("suppliers/", views.supplier_list_view, name="supplier_list_view"),
+    path("add_supplier/", views.add_supplier_view, name="add_supplier_view"),
+    path("edit_supplier/<int:supplier_id>/", views.edit_supplier_view, name="edit_supplier_view"),
+    path("delete_supplier/<int:supplier_id>/", views.delete_supplier_view, name="delete_supplier_view"),
+
+    
 ]

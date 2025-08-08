@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Suppliers{% endblock %}
+
+{% block fileStyle %}
+<link rel="stylesheet" href="{% static 'css/products_list.css' %}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<section class="products-page container-fluid pb-5 pt-0 min-vh-100 rounded-4 my-3 px-4">
+
+    <div class="text-end mb-4">
+        <a href="{% url 'inventory:add_supplier_view' %}" class="btn btn-success rounded-pill px-4 py-2 btn-sm btn-md-lg">
+            + Add New Supplier
+        </a>
+    </div>
+
+    <h2 class="text-center fw-bold mb-4 products-header m-auto">Suppliers List</h2>
+
+    <!-- Suppliers Cards -->
+    <div class="row g-4 justify-content-center">
+        {% for supplier in suppliers %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card h-100 shadow border-0 rounded-4 overflow-hidden">
+                {% if supplier.logo %}
+                <img src="{{ supplier.logo.url }}" class="card-img-top p-3" alt="{{ supplier.name }}"
+                    style="height: 200px; object-fit: contain;">
+                {% else %}
+                <div class="card-img-top d-flex align-items-center justify-content-center bg-light p-3"
+                    style="height: 200px;">
+                    <i class="fas fa-user fa-3x text-muted"></i>
+                </div>
+                {% endif %}
+
+                <div class="card-body d-flex flex-column text-start px-4 pb-4">
+                    <h5 class="card-title fw-bold">{{ supplier.name }}</h5>
+                    {% if supplier.email %}
+                    <p class="card-text text-muted small mb-1"><i class="fas fa-envelope me-2"></i>{{ supplier.email }}</p>
+                    {% endif %}
+                    {% if supplier.phone %}
+                    <p class="card-text text-muted small mb-1"><i class="fas fa-phone me-2"></i>{{ supplier.phone }}</p>
+                    {% endif %}
+                    {% if supplier.website %}
+                    <p class="card-text text-muted small mb-1">
+                        <i class="fas fa-globe me-2"></i>
+                        <a href="{{ supplier.website }}" target="_blank">{{ supplier.website|truncatechars:30 }}</a>
+                    </p>
+                    {% endif %}
+
+                    <div class="mt-auto">
+                        <a href="{% url 'inventory:edit_supplier_view' supplier.id %}" class="btn btn-outline-primary w-100">
+                            Edit Supplier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-muted">No suppliers found.</p>
+        {% endfor %}
+    </div>
+
+</section>
+{% endblock %}

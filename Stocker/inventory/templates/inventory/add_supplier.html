@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Supplier{% endblock %}
+
+{% block fileStyle %}
+<link rel="stylesheet" href="{% static 'css/add_product.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5 p-5 rounded-4 ">
+
+    <h2 class="text-center fw-bold mb-5">Add New Supplier</h2>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="row g-4">
+        {% csrf_token %}
+
+        <div class="col-12">
+            <label for="id_name" class="form-label text-uppercase small fw-bold">Supplier Name</label>
+            <input type="text" name="name" id="id_name" class="form-control bg-light rounded-3 border-0 p-3"
+                placeholder="Enter supplier name" required>
+            {% if form.name.errors %}
+            <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            <label for="id_email" class="form-label text-uppercase small fw-bold">Email</label>
+            <input type="email" name="email" id="id_email" class="form-control bg-light rounded-3 border-0 p-3"
+                placeholder="Enter email (optional)">
+            {% if form.email.errors %}
+            <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            <label for="id_phone" class="form-label text-uppercase small fw-bold">Phone</label>
+            <input type="text" name="phone" id="id_phone" class="form-control bg-light rounded-3 border-0 p-3"
+                placeholder="Enter phone number (optional)">
+            {% if form.phone.errors %}
+            <div class="text-danger small mt-1">{{ form.phone.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-12">
+            <label for="id_website" class="form-label text-uppercase small fw-bold">Website</label>
+            <input type="url" name="website" id="id_website" class="form-control bg-light rounded-3 border-0 p-3"
+                placeholder="Enter website URL (optional)">
+            {% if form.website.errors %}
+            <div class="text-danger small mt-1">{{ form.website.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-12">
+            <label for="id_logo" class="form-label text-uppercase small fw-bold">Logo</label>
+            <input type="file" name="logo" id="id_logo" class="form-control bg-light rounded-3 border-0 p-3">
+            {% if form.logo.errors %}
+            <div class="text-danger small mt-1">{{ form.logo.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-12 text-center mt-4">
+            <button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-bold fs-5">
+                Submit <span class="ms-2">&rarr;</span>
+            </button>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}
