@@ -154,6 +154,39 @@ def add_category(request):
         form = CategoryForm()
     return render(request, 'inventory/add_category.html', {'form': form})
 
+
+def edit_category(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Category updated successfully.")
+            return redirect('inventory:dashboard_view')  
+    else:
+        form = CategoryForm(instance=category)
+
+    return render(request, 'inventory/edit_category.html', {
+        'form': form,
+        'category': category,
+    })
+    
+    
+def delete_category(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+
+    if request.method == 'POST':
+        category.delete()
+        messages.success(request, "Category deleted successfully.")
+        return redirect('inventory:dashboard_view')  
+
+    return render(request, 'inventory/delete_category_confirm.html', {'category': category})
+
+
+def category_list(request):
+    categories = Category.objects.all().order_by('name')  
+    return render(request, 'inventory/category_list.html', {'categories': categories})
 # -------------------
 # Supplier Views
 # -------------------

@@ -9,16 +9,19 @@
 {% endblock %}
 
 {% block content %}
-<section class="products-page container pb-5 pt-3 min-vh-100 rounded-4 my-5">
+<section class="products-page container-fluid pb-5 pt-0 min-vh-100 rounded-4 my-3 px-4">
 
-    <div class="text-center mb-4">
-        <a href="{% url 'inventory:add_product_view' %}" class="btn btn-outline-success px-5">+ Add New Product</a>
+    <div class="text-end mb-4">
+        <a href="{% url 'inventory:add_product_view' %}" class="btn btn-success rounded-pill px-4 py-2 btn-sm btn-md-lg">
+            + Add New Product
+        </a>
     </div>
 
-    <h2 class="text-center fw-bold mb-4">Product List</h2>
+
+    <h2 class="text-center fw-bold mb-4 products-header m-auto">Products List</h2>
 
     <!-- Filter Form -->
-    <form method="GET" class="row g-3 mb-5 justify-content-center align-items-center px-5 mx-2">
+    <form method="GET" class="row g-3 mb-5 justify-content-center align-items-center">
         <div class="col-12 col-md-6">
             <input type="text" name="search" class="form-control" placeholder="Search by product name..."
                 value="{{ search_query }}">

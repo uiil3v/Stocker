@@ -25,11 +25,11 @@
         <!-- Side Bar -->
         <div class="side-bar position-sticky">
             <nav>
-                <a href="">
+                <a href="{% url 'inventory:dashboard_view' %}">
                     <h4>Inventory<i class="fas fa-cubes me-2"></i> Plus</h4>
                 </a>
                 <a href="{% url 'inventory:products_list_view' %}" class="nav-link"><i class="fas fa-box"></i><span>Products</span></a>
-                <a href="#" class="nav-link"><i class="fas fa-tags"></i><span>Categories</span></a>
+                <a href="{% url 'inventory:category_list' %}" class="nav-link"><i class="fas fa-tags"></i><span>Categories</span></a>
                 <a href="#" class="nav-link"><i class="fas fa-truck"></i><span>Suppliers</span></a>
                 <a href="#" class="nav-link"><i class="fas fa-warehouse"></i><span>Stock</span></a>
                 <a href="#" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports</span></a>

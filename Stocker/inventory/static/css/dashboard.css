@@ -19,10 +19,16 @@ body {
 
 
 .dashboard-header {
-    background: linear-gradient(135deg, #256a5d, #568d83 );
+    background: repeating-linear-gradient(
+    45deg,
+    #256a5d,
+    #256a5d 10px,
+    #2c7a6e 10px,
+    #2c7a6e 20px
+  );
     color: white;
     border-radius: 12px;
-    padding: 2rem;
+    padding: 1rem;
     text-align: center;
     margin-bottom: 2.5rem;
 }
