@@ -26,6 +26,8 @@ urlpatterns = [
     path("edit_supplier/<int:supplier_id>/", views.edit_supplier_view, name="edit_supplier_view"),
     path("delete_supplier/<int:supplier_id>/", views.delete_supplier_view, name="delete_supplier_view"),
     path("supplier/<int:supplier_id>/", views.supplier_detail_view, name="supplier_detail_view"),
+    path("supplier-products/<int:sp_id>/toggle/", views.toggle_supplier_product, name="toggle_supplier_product"),
+    path("supplier_product/<int:pk>/edit/", views.edit_supplier_product, name="edit_supplier_product"),
     
     # Stock URLs
     path('stock_status/', views.stock_status_view, name='stock_status_view'),

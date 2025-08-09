@@ -21,7 +21,17 @@ class SupplierForm(forms.ModelForm):
 class SupplierProductForm(forms.ModelForm):
     class Meta:
         model = SupplierProduct
-        fields = '__all__'
+        exclude = ['supplier']
         widgets = {
             'last_supplied': forms.DateInput(attrs={'type': 'date'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        supplier = kwargs.pop('supplier', None)
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['product'].disabled = True
+        elif supplier:
+            self.fields['product'].queryset = Product.objects.exclude(
+                supplierproduct__supplier=supplier
+            )

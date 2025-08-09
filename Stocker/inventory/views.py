@@ -13,12 +13,14 @@ import csv
 def is_admin(user):
     return user.is_superuser
 
+
 # -------------------
 # Product Views
 # -------------------
 
 def dashboard_view(request):
     return render(request, "inventory/dashboard.html")
+
 
 
 def products_list_view(request):
@@ -59,8 +61,6 @@ def products_list_view(request):
 
 
 
-# @user_passes_test(is_admin)
-# @login_required
 def add_product_view(request: HttpRequest):
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES)
@@ -128,10 +128,10 @@ def delete_product_view(request, product_id):
 
 
 
+
 # -------------------
 # Category Views
 # -------------------
-
 
 def category_list(request):
     categories = Category.objects.all().order_by('name')  
@@ -183,14 +183,15 @@ def delete_category(request, category_id):
 
 
 
+
 # -------------------
 # Supplier Views
 # -------------------
 
-
 def supplier_list_view(request):
     suppliers = Supplier.objects.all().order_by('name')
     return render(request, 'inventory/supplier_list.html', {'suppliers': suppliers})
+
 
 
 def add_supplier_view(request):
@@ -206,6 +207,7 @@ def add_supplier_view(request):
         form = SupplierForm()
     
     return render(request, 'inventory/add_supplier.html', {'form': form})
+
 
 
 def edit_supplier_view(request, supplier_id):
@@ -240,27 +242,60 @@ def delete_supplier_view(request, supplier_id):
     return render(request, 'inventory/delete_supplier_confirm.html', {'supplier': supplier})
 
 
+
+
 def supplier_detail_view(request, supplier_id):
     supplier = get_object_or_404(Supplier, id=supplier_id)
     supplier_products = supplier.supplierproduct_set.all()
 
     if request.method == 'POST':
-        form = SupplierProductForm(request.POST)
+        form = SupplierProductForm(request.POST, supplier=supplier)
         if form.is_valid():
-            supplier_product = form.save(commit=False)
-            supplier_product.supplier = supplier 
-            supplier_product.save()
-            messages.success(request, "Product linked to supplier successfully.")
+            if SupplierProduct.objects.filter(
+                supplier=supplier,
+                product=form.cleaned_data['product']
+            ).exists():
+                messages.error(request, "This product is already linked to this supplier.")
+            else:
+                sp = form.save(commit=False)
+                sp.supplier = supplier
+                sp.save()
+                messages.success(request, "Product linked to supplier successfully.")
             return redirect('inventory:supplier_detail_view', supplier_id=supplier.id)
     else:
-        form = SupplierProductForm(initial={'supplier': supplier})
+        form = SupplierProductForm(supplier=supplier)
 
-    context = {
+    return render(request, "inventory/supplier_detail.html", {
         "supplier": supplier,
         "supplier_products": supplier_products,
         "form": form
-    }
-    return render(request, "inventory/supplier_detail.html", context)
+    })
+
+
+
+def toggle_supplier_product(request, sp_id):
+    sp = get_object_or_404(SupplierProduct, id=sp_id)
+    if request.method == "POST":
+        sp.is_active = not sp.is_active
+        sp.save()
+        messages.success(request, f"Status updated to {'Active' if sp.is_active else 'Inactive'}.")
+    return redirect('inventory:supplier_detail_view', supplier_id=sp.supplier_id)
+
+
+
+def edit_supplier_product(request, pk):
+    supplier_product = get_object_or_404(SupplierProduct, pk=pk)
+
+    if request.method == "POST":
+        form = SupplierProductForm(request.POST, instance=supplier_product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Product details updated successfully.")
+            return redirect("inventory:supplier_detail_view", supplier_id=supplier_product.supplier.pk)
+    else:
+        form = SupplierProductForm(instance=supplier_product)
+
+    return render(request, "inventory/edit_supplier_product.html", {"form": form, "supplier_product": supplier_product})
 
 
 # -------------------
@@ -273,6 +308,7 @@ def stock_status_view(request):
     return render(request, 'inventory/stock_status.html', {
         'products': products
     })
+
 
 
 def stock_update_view(request, product_id):
@@ -296,50 +332,24 @@ def stock_update_view(request, product_id):
     return render(request, 'inventory/stock_update.html', {
         'product': product
     })
-# -------------------
-# Search Views
-# -------------------
 
-@login_required
-def search_products(request):
-    return render(request, 'inventory/search_results.html')
+
+
 
 # -------------------
 # Reports and Analytics
 # -------------------
 
-@login_required
-@user_passes_test(is_admin)
-def inventory_report(request):
-    return render(request, 'inventory/inventory_report.html')
 
-@login_required
-@user_passes_test(is_admin)
-def supplier_report(request):
-    return render(request, 'inventory/supplier_report.html')
 
 # -------------------
 # Notifications (dummy views for now)
 # -------------------
 
-@login_required
-def low_stock_alerts(request):
-    return render(request, 'inventory/low_stock_alerts.html')
 
-@login_required
-def expiry_alerts(request):
-    return render(request, 'inventory/expiry_alerts.html')
 
 # -------------------
 # CSV Import/Export (Bonus)
 # -------------------
 
-@login_required
-@user_passes_test(is_admin)
-def import_products_csv(request):
-    return HttpResponse("Import CSV - to be implemented")
 
-@login_required
-@user_passes_test(is_admin)
-def export_inventory_csv(request):
-    return HttpResponse("Export CSV - to be implemented")
