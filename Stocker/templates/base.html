@@ -53,26 +53,7 @@
                             class="fa-solid fa-magnifying-glass"></i>
                     </form>
                 </div>
-                <!-- Offcanvas Sidebar -->
-                <div class="offcanvas offcanvas-start custom-offcanvas" tabindex="-1" id="sidebarOffcanvas">
-                    <div class="offcanvas-header border-bottom">
-                        <h5 class="offcanvas-title fw-bold fs-2">Inventory Plus</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                    </div>
-                    <div class="offcanvas-body d-flex flex-column justify-content-between">
-                        <nav class="d-flex flex-column gap-2">
-                            <a href="{% url 'inventory:products_list_view' %}" class="nav-link fs-4"><i class="fas fa-box me-2"></i> Products</a>
-                            <a href="{% url 'inventory:category_list' %}" class="nav-link fs-4"><i class="fas fa-tags me-2"></i> Categories</a>
-                            <a href="{% url 'inventory:supplier_list_view' %}" class="nav-link fs-4"><i class="fas fa-truck me-2"></i> Suppliers</a>
-                            <a href="{% url 'inventory:stock_status_view' %}" class="nav-link fs-4"><i class="fas fa-warehouse me-2"></i> Stock</a>
-                            <a href="#" class="nav-link fs-4"><i class="fas fa-chart-line me-2"></i> Reports</a>
-                        </nav>
-                        <div>
-                            <hr>
-                            <a href="#" class="nav-link fs-4"><i class="fas fa-cog me-2"></i> Settings</a>
-                        </div>
-                    </div>
-                </div>
+
 
 
 
@@ -97,6 +78,26 @@
 
 
 
+                    <!-- Offcanvas Sidebar -->
+                <div class="offcanvas offcanvas-start custom-offcanvas" tabindex="-1" id="sidebarOffcanvas" data-bs-backdrop="true" data-bs-scroll="false">
+                    <div class="offcanvas-header border-bottom">
+                        <h5 class="offcanvas-title fw-bold fs-2">Inventory Plus</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body d-flex flex-column justify-content-between">
+                        <nav class="d-flex flex-column gap-2">
+                            <a href="{% url 'inventory:products_list_view' %}" class="nav-link fs-4"><i class="fas fa-box me-2"></i> Products</a>
+                            <a href="{% url 'inventory:category_list' %}" class="nav-link fs-4"><i class="fas fa-tags me-2"></i> Categories</a>
+                            <a href="{% url 'inventory:supplier_list_view' %}" class="nav-link fs-4"><i class="fas fa-truck me-2"></i> Suppliers</a>
+                            <a href="{% url 'inventory:stock_status_view' %}" class="nav-link fs-4"><i class="fas fa-warehouse me-2"></i> Stock</a>
+                            <a href="#" class="nav-link fs-4"><i class="fas fa-chart-line me-2"></i> Reports</a>
+                        </nav>
+                        <div>
+                            <hr>
+                            <a href="#" class="nav-link fs-4"><i class="fas fa-cog me-2"></i> Settings</a>
+                        </div>
+                    </div>
+                </div>
 
 
 </body>

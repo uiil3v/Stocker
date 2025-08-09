@@ -12,11 +12,6 @@
 
     <h2 class="text-center fw-bold mb-5">Add New Supplier</h2>
 
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-    {% endif %}
 
     {% if error %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert">

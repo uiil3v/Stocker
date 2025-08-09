@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Supplier Details{% endblock %}
+
+{% block fileStyle %}
+<link rel="stylesheet" href="{% static 'css/add_product.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex align-items-center gap-4">
+            {% if supplier.logo %}
+                <img src="{{ supplier.logo.url }}" alt="{{ supplier.name }}" class="rounded" style="max-width: 120px;">
+            {% else %}
+                <img src="{% static 'images/default-supplier.png' %}" alt="No Logo" class="rounded" style="max-width: 120px;">
+            {% endif %}
+            <div>
+                <h3 class="fw-bold mb-2">{{ supplier.name }}</h3>
+                <p class="mb-1"><strong>Email:</strong> {{ supplier.email|default:"—" }}</p>
+                <p class="mb-1"><strong>Phone:</strong> {{ supplier.phone|default:"—" }}</p>
+                {% if supplier.website %}
+                    <p class="mb-0"><strong>Website:</strong> <a href="{{ supplier.website }}" target="_blank">{{ supplier.website }}</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white fw-bold">
+            Supplied Products
+        </div>
+        <div class="card-body p-0">
+            {% if supplier_products %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Product</th>
+                            <th>Unit Cost</th>
+                            <th>Lead Time (Days)</th>
+                            <th>Last Supplied</th>
+                            <th>Min Order Qty</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sp in supplier_products %}
+                        <tr>
+                            <td>{{ sp.product.name }}</td>
+                            <td>{{ sp.unit_cost }}</td>
+                            <td>{{ sp.lead_time_days }}</td>
+                            <td>{{ sp.last_supplied|default:"—" }}</td>
+                            <td>{{ sp.min_order_qty }}</td>
+                            <td>
+                                {% if sp.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p class="p-3 mb-0">No products linked to this supplier yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white fw-bold">
+            Link New Product to Supplier
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label for="id_product" class="form-label text-uppercase small fw-bold">Product</label>
+                        <select name="product" id="id_product" class="form-select bg-light rounded-3 border-0 p-3" required>
+                            {% for p in form.fields.product.queryset %}
+                                <option value="{{ p.id }}">{{ p.name }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.product.errors %}
+                            <div class="text-danger small mt-1">{{ form.product.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_unit_cost" class="form-label text-uppercase small fw-bold">Unit Cost</label>
+                        <input type="number" step="0.01" name="unit_cost" id="id_unit_cost"
+                               class="form-control bg-light rounded-3 border-0 p-3"
+                               placeholder="Enter unit cost" required>
+                        {% if form.unit_cost.errors %}
+                            <div class="text-danger small mt-1">{{ form.unit_cost.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_lead_time_days" class="form-label text-uppercase small fw-bold">Lead Time (Days)</label>
+                        <input type="number" name="lead_time_days" id="id_lead_time_days"
+                               class="form-control bg-light rounded-3 border-0 p-3"
+                               placeholder="Enter lead time" required>
+                        {% if form.lead_time_days.errors %}
+                            <div class="text-danger small mt-1">{{ form.lead_time_days.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_last_supplied" class="form-label text-uppercase small fw-bold">Last Supplied</label>
+                        <input type="date" name="last_supplied" id="id_last_supplied"
+                               class="form-control bg-light rounded-3 border-0 p-3">
+                        {% if form.last_supplied.errors %}
+                            <div class="text-danger small mt-1">{{ form.last_supplied.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_min_order_qty" class="form-label text-uppercase small fw-bold">Min Order Qty</label>
+                        <input type="number" name="min_order_qty" id="id_min_order_qty"
+                               class="form-control bg-light rounded-3 border-0 p-3"
+                               placeholder="Enter minimum quantity" required>
+                        {% if form.min_order_qty.errors %}
+                            <div class="text-danger small mt-1">{{ form.min_order_qty.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_is_active" class="form-label text-uppercase small fw-bold">Status</label>
+                        <select name="is_active" id="id_is_active" class="form-select bg-light rounded-3 border-0 p-3" required>
+                            <option value="True">Active</option>
+                            <option value="False">Inactive</option>
+                        </select>
+                        {% if form.is_active.errors %}
+                            <div class="text-danger small mt-1">{{ form.is_active.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success px-4">Add Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

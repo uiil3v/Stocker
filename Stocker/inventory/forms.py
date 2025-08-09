@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product, Category, Supplier
+from .models import Product, Category, Supplier, SupplierProduct
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -16,3 +16,12 @@ class SupplierForm(forms.ModelForm):
     class Meta:
         model = Supplier
         fields = '__all__'
+
+
+class SupplierProductForm(forms.ModelForm):
+    class Meta:
+        model = SupplierProduct
+        fields = '__all__'
+        widgets = {
+            'last_supplied': forms.DateInput(attrs={'type': 'date'}),
+        }

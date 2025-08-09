@@ -2,12 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from .models import Product, Category, Supplier
-from .forms import ProductForm, CategoryForm, SupplierForm
+from .models import Product, Category, Supplier, SupplierProduct
+from .forms import ProductForm, CategoryForm, SupplierForm, SupplierProductForm
 from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
-
 import csv
 
 # صلاحيات المسؤول
@@ -21,13 +20,16 @@ def is_admin(user):
 def dashboard_view(request):
     return render(request, "inventory/dashboard.html")
 
-def products_list_view(request):
-    products = Product.objects.all().order_by("-created_at")
 
-    # الفلاتر
-    search_query = request.GET.get("search")
-    category_filter = request.GET.get("category")
-    supplier_filter = request.GET.get("supplier")
+def products_list_view(request):
+    products = (Product.objects
+                .select_related('category')
+                .prefetch_related('suppliers')
+                .order_by("-created_at"))
+
+    search_query = request.GET.get("search") or ""
+    category_id = request.GET.get("category")   
+    supplier_id = request.GET.get("supplier")  
 
     if search_query:
         products = products.filter(
@@ -35,31 +37,26 @@ def products_list_view(request):
             Q(description__icontains=search_query)
         )
 
-    if category_filter:
-        products = products.filter(category=category_filter)
+    if category_id and category_id.isdigit():
+        products = products.filter(category_id=category_id)
 
-    if supplier_filter:
-        products = products.filter(suppliers__id=supplier_filter)
+    if supplier_id and supplier_id.isdigit():
+        products = products.filter(suppliers__id=supplier_id)
 
-
-    paginator = Paginator(products, 9) 
+    paginator   = Paginator(products, 9)
     page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    
-    categories = Category.objects.all()
-    suppliers = Supplier.objects.all()
+    page_obj    = paginator.get_page(page_number)
 
     context = {
         "products": page_obj,
-        "categories": categories,
-        "suppliers": suppliers,
+        "categories": Category.objects.all(),
+        "suppliers": Supplier.objects.all(),
         "search_query": search_query,
-        "selected_category": category_filter,
-        "selected_supplier": supplier_filter,
+        "selected_category": category_id,  
+        "selected_supplier": supplier_id,  
     }
-
     return render(request, "inventory/products_list.html", context)
+
 
 
 # @user_passes_test(is_admin)
@@ -71,7 +68,7 @@ def add_product_view(request: HttpRequest):
             try:
                 form.save()
                 messages.success(request, "Product added successfully.")
-                return redirect("inventory:dashboard_view")  
+                return redirect("inventory:products_list_view")  
             except Exception as e:
                 print("❌ Error during form.save():", e)
                 return render(request, "inventory/add_product.html", {
@@ -99,7 +96,7 @@ def edit_product_view(request: HttpRequest, product_id: int):
             try:
                 form.save()
                 messages.success(request, "Product updated successfully.")
-                return redirect("inventory:dashboard_view")  # غيّرها إذا عندك صفحة products
+                return redirect("inventory:products_list_view")  
             except Exception as e:
                 print("❌ Error during form.save():", e)
                 return render(request, "inventory/edit_product.html", {
@@ -125,7 +122,7 @@ def delete_product_view(request, product_id):
     if request.method == "POST":
         product.delete()
         messages.success(request, "Product deleted successfully.")
-        return redirect("inventory:dashboard_view") 
+        return redirect("inventory:products_list_view") 
 
     return redirect("inventory:edit_product_view", product_id=product_id)
 
@@ -148,7 +145,7 @@ def add_category(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Category added successfully.")
-            return redirect('inventory:dashboard_view')  
+            return redirect('inventory:category_list')  
     else:
         form = CategoryForm()
     return render(request, 'inventory/add_category.html', {'form': form})
@@ -163,7 +160,7 @@ def edit_category(request, category_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Category updated successfully.")
-            return redirect('inventory:dashboard_view')  
+            return redirect('inventory:category_list')  
     else:
         form = CategoryForm(instance=category)
 
@@ -180,7 +177,7 @@ def delete_category(request, category_id):
     if request.method == 'POST':
         category.delete()
         messages.success(request, "Category deleted successfully.")
-        return redirect('inventory:dashboard_view')  
+        return redirect('inventory:category_list')  
 
     return render(request, 'inventory/delete_category_confirm.html', {'category': category})
 
@@ -202,7 +199,7 @@ def add_supplier_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Supplier added successfully.")
-            return redirect('inventory:dashboard_view')  
+            return redirect('inventory:supplier_list_view')  
         else:
             messages.error(request, "Form is invalid. Please correct the errors.")
     else:
@@ -219,7 +216,7 @@ def edit_supplier_view(request, supplier_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Supplier updated successfully.")
-            return redirect('inventory:dashboard_view')
+            return redirect('inventory:supplier_list_view')
         else:
             messages.error(request, "Form is invalid. Please correct the errors.")
     else:
@@ -230,9 +227,6 @@ def edit_supplier_view(request, supplier_id):
         'supplier': supplier,
     })
     
-    
-def is_admin(user):
-    return user.is_superuser
 
 
 def delete_supplier_view(request, supplier_id):
@@ -241,10 +235,32 @@ def delete_supplier_view(request, supplier_id):
     if request.method == 'POST':
         supplier.delete()
         messages.success(request, "Supplier deleted successfully.")
-        return redirect('inventory:dashboard_view')
+        return redirect('inventory:supplier_list_view')
 
     return render(request, 'inventory/delete_supplier_confirm.html', {'supplier': supplier})
 
+
+def supplier_detail_view(request, supplier_id):
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+    supplier_products = supplier.supplierproduct_set.all()
+
+    if request.method == 'POST':
+        form = SupplierProductForm(request.POST)
+        if form.is_valid():
+            supplier_product = form.save(commit=False)
+            supplier_product.supplier = supplier 
+            supplier_product.save()
+            messages.success(request, "Product linked to supplier successfully.")
+            return redirect('inventory:supplier_detail_view', supplier_id=supplier.id)
+    else:
+        form = SupplierProductForm(initial={'supplier': supplier})
+
+    context = {
+        "supplier": supplier,
+        "supplier_products": supplier_products,
+        "form": form
+    }
+    return render(request, "inventory/supplier_detail.html", context)
 
 
 # -------------------
