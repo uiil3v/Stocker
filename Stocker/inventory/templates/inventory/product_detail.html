@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product Details{% endblock %}
+
+{% block fileStyle %}
+<link rel="stylesheet" href="{% static 'css/add_product.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-sm">
+    <div class="card-header bg-success text-white fw-bold">
+      Product Details — {{ product.name }}
+    </div>
+
+    <div class="card-body">
+      <div class="row g-4">
+        <!-- Image -->
+        <div class="col-md-4">
+          <div class="ratio ratio-1x1 border rounded-3 d-flex align-items-center justify-content-center bg-light">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded-3">
+            {% else %}
+              <span class="text-muted">No Image</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Fields -->
+        <div class="col-md-8">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label text-uppercase small fw-bold mb-1">Name</label>
+              <div class="form-control bg-light border-0 p-3">{{ product.name }}</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-uppercase small fw-bold mb-1">Category</label>
+              <div class="form-control bg-light border-0 p-3">{{ product.category.name|default:"—" }}</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-uppercase small fw-bold mb-1">SKU</label>
+              <div class="form-control bg-light border-0 p-3">{{ product.sku|default:"—" }}</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-uppercase small fw-bold mb-1">Price</label>
+              <div class="form-control bg-light border-0 p-3">{{ product.price|default:"—" }}</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-uppercase small fw-bold mb-1">Quantity in Stock</label>
+              <div class="form-control bg-light border-0 p-3">{{ product.quantity_in_stock|default:"—" }}</div>
+            </div>
+
+            <!-- Optional medicine fields (لو موجودة في الموديل) -->
+            {% if product.expiry_date or product.batch_number or product.dosage_form or product.strength %}
+              <div class="col-12"><hr class="my-2"><h6 class="fw-bold">Medicine Info</h6></div>
+
+              <div class="col-md-6">
+                <label class="form-label text-uppercase small fw-bold mb-1">Expiry Date</label>
+                <div class="form-control bg-light border-0 p-3">{{ product.expiry_date|date:"Y-m-d"|default:"—" }}</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-uppercase small fw-bold mb-1">Batch No.</label>
+                <div class="form-control bg-light border-0 p-3">{{ product.batch_number|default:"—" }}</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-uppercase small fw-bold mb-1">Dosage Form</label>
+                <div class="form-control bg-light border-0 p-3">{{ product.dosage_form|default:"—" }}</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-uppercase small fw-bold mb-1">Strength</label>
+                <div class="form-control bg-light border-0 p-3">{{ product.strength|default:"—" }}</div>
+              </div>
+            {% endif %}
+
+            <div class="col-12">
+              <label class="form-label text-uppercase small fw-bold mb-1">Description</label>
+              <div class="form-control bg-light border-0 p-3" style="min-height:88px;">
+                {{ product.description|default:"—" }}
+              </div>
+            </div>
+
+            <!-- Suppliers via through model -->
+            {% if supplier_products %}
+              <div class="col-12">
+                <hr class="my-2">
+                <h6 class="fw-bold mb-2">Suppliers</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Supplier</th>
+                        <th>Unit Cost</th>
+                        <th>Lead Time</th>
+                        <th>Last Supplied</th>
+                        <th>Min Order Qty</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for sp in supplier_products %}
+                        <tr>
+                          <td>{{ sp.supplier.name }}</td>
+                          <td>{{ sp.unit_cost|default:"—" }}</td>
+                          <td>{{ sp.lead_time|default:"—" }}</td>
+                          <td>{{ sp.last_supplied|date:"Y-m-d"|default:"—" }}</td>
+                          <td>{{ sp.min_order_qty|default:"—" }}</td>
+                          <td>
+                            {% if sp.is_active %}
+                              <span class="badge bg-success">Active</span>
+                            {% else %}
+                              <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% empty %}
+                        <tr><td colspan="6" class="text-muted">No supplier links</td></tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer d-flex justify-content-between">
+      <a href="{% url 'inventory:products_list_view' %}" class="btn btn-outline-secondary">← Back to Products</a>
+      <div class="d-flex gap-2">
+        <a href="{% url 'inventory:edit_product' product.id %}" class="btn btn-primary">Edit Product</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

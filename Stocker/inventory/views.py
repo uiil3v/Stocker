@@ -61,6 +61,25 @@ def products_list_view(request):
 
 
 
+def product_detail_view(request, product_id):
+    product = get_object_or_404(
+        Product.objects.select_related("category").prefetch_related(
+            "suppliers" 
+        ),
+        pk=product_id
+    )
+
+    supplier_products = getattr(product, "supplierproduct_set", None)
+    supplier_products = supplier_products.select_related("supplier") if supplier_products else None
+
+    context = {
+        "product": product,
+        "supplier_products": supplier_products, 
+    }
+    return render(request, "inventory/product_detail.html", context)
+
+
+
 def add_product_view(request: HttpRequest):
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES)

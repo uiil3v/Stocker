@@ -88,6 +88,9 @@
                     <p class="text-muted small">Category: {{ product.category }}</p>
 
                     <div class="mt-auto">
+                        <a href="{% url 'inventory:product_detail_view' product.id %}" class="btn btn-outline-success w-100 mb-2">
+                            View Detail
+                        </a>
                         <a href="{% url 'inventory:edit_product' product.id %}" class="btn btn-outline-primary w-100">
                             Edit Product
                         </a>
