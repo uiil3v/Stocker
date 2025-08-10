@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product, Category, Supplier, SupplierProduct
+from .models import Product, Category, Supplier, SupplierProduct, StockMovement
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -35,3 +35,10 @@ class SupplierProductForm(forms.ModelForm):
             self.fields['product'].queryset = Product.objects.exclude(
                 supplierproduct__supplier=supplier
             )
+
+
+
+class StockUpdateForm(forms.Form):
+    movement_type = forms.ChoiceField(choices=StockMovement.MOVEMENT_TYPES)
+    quantity = forms.IntegerField(min_value=0)
+    reason = forms.CharField(required=False)

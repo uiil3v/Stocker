@@ -2,15 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from .models import Product, Category, Supplier, SupplierProduct
-from .forms import ProductForm, CategoryForm, SupplierForm, SupplierProductForm
+from .models import Product, Category, Supplier, SupplierProduct, StockMovement
+from .forms import ProductForm, CategoryForm, SupplierForm, SupplierProductForm, StockUpdateForm
 from django.db.models import Q, F, Count
 from django.utils import timezone
 from datetime import timedelta
 from django.core.paginator import Paginator
 from .utils import get_stock_stats, LOW_STOCK_THRESHOLD, NEAR_EXPIRY_DAYS, get_supplier_stats
 import csv
-
 
 
 
@@ -350,29 +349,77 @@ def stock_status_view(request):
         'low_stock_threshold': LOW_STOCK_THRESHOLD,
     })
 
-
 @login_required
 def stock_update_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
     if request.method == 'POST':
-        new_quantity = request.POST.get('quantity')
-        try:
-            new_quantity = int(new_quantity)
-            if new_quantity < 0:
-                raise ValueError("Quantity can't be negative.")
+        form = StockUpdateForm(request.POST)
+        if form.is_valid():
+            movement_type = form.cleaned_data['movement_type']
+            new_quantity = form.cleaned_data['quantity']
+            reason = form.cleaned_data['reason']
 
+            previous_quantity = product.quantity_in_stock
+            quantity_change = new_quantity - previous_quantity
+
+            # تحديث الكمية
             product.quantity_in_stock = new_quantity
             product.save()
+
+            # تسجيل الحركة
+            StockMovement.objects.create(
+                product=product,
+                movement_type=movement_type,
+                previous_quantity=previous_quantity,
+                new_quantity=new_quantity,
+                quantity_change=quantity_change,
+                reason=reason,
+                user=request.user
+            )
+
+            today = timezone.localdate()
+            if 0 < product.quantity_in_stock < LOW_STOCK_THRESHOLD:
+                messages.warning(request, f"⚠ {product.name} is now Low Stock ({product.quantity_in_stock} units left).")
+            if product.expiry_date and today <= product.expiry_date <= today + timezone.timedelta(days=get_stock_stats()['near_expiry_days']):
+                messages.warning(request, f"⏳ {product.name} is Near Expiry on {product.expiry_date}.")
+
             messages.success(request, "Stock quantity updated successfully.")
             return redirect('inventory:stock_status_view')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = StockUpdateForm()
 
-        except ValueError:
-            messages.error(request, "Please enter a valid positive number.")
-    
     return render(request, 'inventory/stock_update.html', {
-        'product': product
+        'product': product,
+        'form': form,
+        'low_stock_threshold': LOW_STOCK_THRESHOLD
     })
+    
+    
+@login_required
+def product_movements_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    movements = product.stock_movements.all().order_by('-created_at')  
+
+    from .utils import LOW_STOCK_THRESHOLD  
+
+    return render(request, 'inventory/product_movements.html', {
+        'product': product,
+        'movements': movements,
+        'low_stock_threshold': LOW_STOCK_THRESHOLD
+    })
+    
+    
+@login_required
+def stock_movements_view(request):
+    movements = StockMovement.objects.select_related('product', 'user').order_by('-created_at')
+
+    return render(request, 'inventory/stock_movements.html', {
+        'movements': movements
+    })
+    
 
 
 # -------------------

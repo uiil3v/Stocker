@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} — Stock Movements{% endblock %}
+
+{% block fileStyle %}
+<link rel="stylesheet" href="{% static 'css/add_product.css' %}">
+<link rel="stylesheet" href="{% static 'css/product_movements.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 min-vh-100">
+
+    <div class="movements-card mb-4">
+        <div class="movements-header">
+            Stock Movements — {{ product.name }}
+        </div>
+        <div class="p-4 bg-white">
+            {% if movements %}
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle table-movements">
+                    <thead class="text-center">
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Previous Qty</th>
+                            <th>New Qty</th>
+                            <th>Change</th>
+                            <th>Reason</th>
+                            <th>User</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                        {% for movement in movements %}
+                        <tr>
+                            <td>{{ movement.created_at|date:"Y-m-d H:i" }}</td>
+                            <td>
+                                {% if movement.movement_type == 'IN' %}
+                                    <span class="badge badge-in">Stock In</span>
+                                {% elif movement.movement_type == 'OUT' %}
+                                    <span class="badge badge-out">Stock Out</span>
+                                {% else %}
+                                    <span class="badge badge-adjust">Adjust</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ movement.previous_quantity }}</td>
+                            <td>{{ movement.new_quantity }}</td>
+                            <td>
+                                {% if movement.quantity_change > 0 %}
+                                    <span class="text-success fw-bold">+{{ movement.quantity_change }}</span>
+                                {% elif movement.quantity_change < 0 %}
+                                    <span class="text-danger fw-bold">{{ movement.quantity_change }}</span>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ movement.reason|default:"—" }}</td>
+                            <td>{{ movement.user.username|default:"System" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <div class="alert alert-info mb-0">No stock movements recorded for this product.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="{% url 'inventory:stock_status_view' %}" class="btn btn-outline-secondary px-4">
+            &larr; Back to Stock Status
+        </a>
+    </div>
+
+</div>
+{% endblock %}

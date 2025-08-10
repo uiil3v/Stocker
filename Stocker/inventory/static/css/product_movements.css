@@ -1,0 +1,25 @@
+.movements-card {
+    border-radius: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+.movements-header {
+    background-color: #247564;
+    color: white;
+    padding: 1rem;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+.table-movements th {
+    background-color: #f8f9fa;
+}
+.badge-in {
+    background-color: #28a745;
+}
+.badge-out {
+    background-color: #dc3545;
+}
+.badge-adjust {
+    background-color: #ffc107;
+    color: black;
+}

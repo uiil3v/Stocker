@@ -1,5 +1,6 @@
 from django.db import models
 from cloudinary.models import CloudinaryField
+from django.contrib.auth.models import User
 
 
        
@@ -84,3 +85,23 @@ class SupplierProduct(models.Model):
 
     class Meta:
         unique_together = ('supplier', 'product')
+
+
+class StockMovement(models.Model):
+    MOVEMENT_TYPES = [
+        ('IN', 'Stock In'),
+        ('OUT', 'Stock Out'),
+        ('ADJUST', 'Adjust'),
+    ]
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="stock_movements")
+    movement_type = models.CharField(max_length=10, choices=MOVEMENT_TYPES)
+    previous_quantity = models.IntegerField()
+    new_quantity = models.IntegerField()
+    quantity_change = models.IntegerField()
+    reason = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_movement_type_display()} - {self.product.name} ({self.quantity_change})"
