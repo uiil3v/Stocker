@@ -38,7 +38,7 @@
                         <small class="text-muted d-block">Near Expiry ({{ stats.near_expiry_days }} days)</small>
                         <span class="fs-3 fw-bold text-warning">{{ stats.near_expiry }}</span>
                     </div>
-                    <a href="#" class="btn btn-outline-success px-4 rounded-pill">View</a>
+                    <a href="{% url 'inventory:inventory_reports_view' %}" class="btn btn-outline-success px-4 rounded-pill">View</a>
                 </div>
             </div>
         </div>
@@ -48,11 +48,35 @@
             <div class="card shadow-sm h-100 border-success rounded-4">
                 <div class="card-body text-center p-5">
                     <h3 class="fw-bold mb-4">Supplier Reports</h3>
-                    <p class="text-muted mb-4">View supplier statistics and their products.</p>
-                    <a href="#" class="btn btn-outline-success px-4 rounded-pill">View</a>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Total Suppliers</small>
+                        <span class="fs-3 fw-bold">{{ supplier_stats.total_suppliers }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Total Supplied Products</small>
+                        <span class="fs-3 fw-bold">{{ supplier_stats.total_supplied_products }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block">
+                            Suppliers with Low Stock Products 
+                            <span class="text-secondary">(&lt; {{ supplier_stats.low_stock_threshold }} units)</span>
+                        </small>
+                        <span class="fs-3 fw-bold text-warning">{{ supplier_stats.suppliers_with_low_stock }}</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <small class="text-muted d-block">Suppliers with Expired Products</small>
+                        <span class="fs-3 fw-bold text-danger">{{ supplier_stats.suppliers_with_expired }}</span>
+                    </div>
+
+                    <a href="{% url 'inventory:supplier_reports_view' %}" class="btn btn-outline-success px-4 rounded-pill">View</a>
                 </div>
             </div>
         </div>
+
 
     </div>
 </div>

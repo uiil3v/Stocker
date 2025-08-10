@@ -8,8 +8,11 @@ from django.db.models import Q, F, Count
 from django.utils import timezone
 from datetime import timedelta
 from django.core.paginator import Paginator
-from .utils import get_stock_stats, LOW_STOCK_THRESHOLD
+from .utils import get_stock_stats, LOW_STOCK_THRESHOLD, NEAR_EXPIRY_DAYS, get_supplier_stats
 import csv
+
+
+
 
 
 
@@ -378,6 +381,83 @@ def stock_update_view(request, product_id):
 
 def reports_home_view(request):
     context = {
-        "stats": get_stock_stats()
+        "stats": get_stock_stats(),
+        "supplier_stats": get_supplier_stats()
     }
     return render(request, "inventory/reports_home.html", context)
+
+
+
+@login_required
+def inventory_reports_view(request):
+    today = timezone.localdate()
+
+    low_stock_products = Product.objects.filter(
+        quantity_in_stock__lt=LOW_STOCK_THRESHOLD,
+        quantity_in_stock__gt=0
+    ).order_by('name')
+
+    expired_products = Product.objects.filter(
+        expiry_date__isnull=False,
+        expiry_date__lt=today
+    ).order_by('name')
+
+    near_expiry_products = Product.objects.filter(
+        expiry_date__isnull=False,
+        expiry_date__gte=today,
+        expiry_date__lte=today + timedelta(days=NEAR_EXPIRY_DAYS)
+    ).order_by('name')
+
+    context = {
+        "low_stock_products": low_stock_products,
+        "expired_products": expired_products,
+        "near_expiry_products": near_expiry_products,
+        "low_stock_threshold": LOW_STOCK_THRESHOLD,
+        "near_expiry_days": NEAR_EXPIRY_DAYS,
+    }
+    return render(request, "inventory/inventory_reports.html", context)
+
+
+@login_required
+def supplier_reports_view(request):
+    today = timezone.localdate()
+
+    suppliers_data = []
+
+    suppliers = Supplier.objects.all().order_by("name")
+
+    for supplier in suppliers:
+        products = supplier.products.all().distinct()
+
+        total_products = products.count()
+
+        low_stock_count = products.filter(
+            quantity_in_stock__lt=LOW_STOCK_THRESHOLD,
+            quantity_in_stock__gt=0
+        ).count()
+
+        expired_count = products.filter(
+            expiry_date__isnull=False,
+            expiry_date__lt=today
+        ).count()
+
+        near_expiry_count = products.filter(
+            expiry_date__isnull=False,
+            expiry_date__gte=today,
+            expiry_date__lte=today + timedelta(days=NEAR_EXPIRY_DAYS)
+        ).count()
+
+        suppliers_data.append({
+            "supplier": supplier,
+            "total_products": total_products,
+            "low_stock_count": low_stock_count,
+            "expired_count": expired_count,
+            "near_expiry_count": near_expiry_count,
+        })
+
+    context = {
+        "suppliers_data": suppliers_data,
+        "low_stock_threshold": LOW_STOCK_THRESHOLD,
+        "near_expiry_days": NEAR_EXPIRY_DAYS
+    }
+    return render(request, "inventory/supplier_reports.html", context)

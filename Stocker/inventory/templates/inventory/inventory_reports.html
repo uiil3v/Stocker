@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inventory Reports{% endblock %}
+
+{% block fileStyle %}
+<link rel="stylesheet" href="{% static 'css/inventory_reports.css' %}">
+<style>
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5 pt-4 min-vh-100">
+    <h2 class="text-center fw-bold mb-5 inventory-reports-header m-auto">Inventory Reports</h2>
+
+    <!-- Low Stock -->
+    <div class="report-card mb-4">
+        <div class="report-header header-green-light d-flex justify-content-between align-items-center">
+            <span>Low Stock (&lt; {{ low_stock_threshold }} units)</span>
+            <span class="badge badge-green-dark fs-5">{{ low_stock_products.count }}</span>
+        </div>
+        <div class="report-body">
+            <div class="table-responsive table-custom">
+                <table class="table table-hover align-middle text-center mb-0">
+                    <thead class="header-green-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Stock Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in low_stock_products %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ p.name }}</td>
+                                <td>{{ p.category.name }}</td>
+                                <td class="fw-bold text-danger">{{ p.quantity_in_stock }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-muted">No products found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expired -->
+    <div class="report-card mb-4">
+        <div class="report-header header-green-dark d-flex justify-content-between align-items-center">
+            <span>Expired Products</span>
+            <span class="badge badge-green-light fs-5">{{ expired_products.count }}</span>
+        </div>
+        <div class="report-body">
+            <div class="table-responsive table-custom">
+                <table class="table table-hover align-middle text-center mb-0">
+                    <thead class="header-green-medium">
+                        <tr>
+                            <th>#</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Expiry Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in expired_products %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ p.name }}</td>
+                                <td>{{ p.category.name }}</td>
+                                <td class="fw-bold">{{ p.expiry_date }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-muted">No expired products.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Near Expiry -->
+    <div class="report-card mb-3">
+        <div class="report-header header-green-light d-flex justify-content-between align-items-center">
+            <span>Near Expiry ({{ near_expiry_days }} days)</span>
+            <span class="badge badge-green-dark fs-5">{{ near_expiry_products.count }}</span>
+        </div>
+        <div class="report-body">
+            <div class="table-responsive table-custom">
+                <table class="table table-hover align-middle text-center mb-0">
+                    <thead class="header-green-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Expiry Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in near_expiry_products %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ p.name }}</td>
+                                <td>{{ p.category.name }}</td>
+                                <td class="fw-bold">{{ p.expiry_date }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-muted">No products near expiry.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

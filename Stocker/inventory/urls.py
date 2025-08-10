@@ -36,6 +36,9 @@ urlpatterns = [
     
     # Reports URLs
     path("reports/", views.reports_home_view, name="reports_home"),
+    path("reports/inventory/", views.inventory_reports_view, name="inventory_reports_view"),
+    path("reports/suppliers/", views.supplier_reports_view, name="supplier_reports_view"),
+
 
 
 
