@@ -34,7 +34,12 @@
                 <a href="{% url 'inventory:stock_status_view' %}" class="nav-link"><i class="fas fa-warehouse"></i><span>Stock</span></a>
                 <a href="#" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports</span></a>
             </nav>
-            <a href="#" class="nav-link-setting"><i class="fas fa-cog"></i><span>Settings</span></a>
+            <div>
+                <a href="#" class="nav-link"><i class="fas fa-cog"></i><span>Settings</span></a>
+            <a href="{% url 'accounts:logout' %}" class="nav-link logout-link">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+            </a>
+            </div>  
         </div>
 
 
@@ -95,6 +100,9 @@
                         <div>
                             <hr>
                             <a href="#" class="nav-link fs-4"><i class="fas fa-cog me-2"></i> Settings</a>
+                            <a href="{% url 'accounts:logout' %}" class="nav-link fs-4 logout-link mb-5 text-danger">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </a>
                         </div>
                     </div>
                 </div>

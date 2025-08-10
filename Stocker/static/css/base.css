@@ -130,6 +130,16 @@ body{
 }
 
 
+.top-side .side-bar .logout-link {
+    color: var(--danger-color);
+    margin-bottom: 30px;
+}
+
+.top-side .side-bar .logout-link:hover {
+    background-color: rgba(220, 38, 38, 0.1); 
+    border-radius: 8px;
+}
+
 /* Top Bar */
 
 .top-side .top-bar{

@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Product, Category, Supplier, SupplierProduct
 from .forms import ProductForm, CategoryForm, SupplierForm, SupplierProductForm
-from django.http import HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
 import csv
@@ -18,11 +17,12 @@ def is_admin(user):
 # Product Views
 # -------------------
 
+@login_required
 def dashboard_view(request):
     return render(request, "inventory/dashboard.html")
 
 
-
+@login_required
 def products_list_view(request):
     products = (Product.objects
                 .select_related('category')
@@ -60,7 +60,7 @@ def products_list_view(request):
     return render(request, "inventory/products_list.html", context)
 
 
-
+@login_required
 def product_detail_view(request, product_id):
     product = get_object_or_404(
         Product.objects.select_related("category").prefetch_related(
@@ -79,7 +79,8 @@ def product_detail_view(request, product_id):
     return render(request, "inventory/product_detail.html", context)
 
 
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def add_product_view(request: HttpRequest):
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES)
@@ -106,7 +107,11 @@ def add_product_view(request: HttpRequest):
 
 
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+
 def edit_product_view(request: HttpRequest, product_id: int):
+    
     product = get_object_or_404(Product, id=product_id)
 
     if request.method == "POST":
@@ -135,6 +140,8 @@ def edit_product_view(request: HttpRequest, product_id: int):
 
 
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def delete_product_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
@@ -146,18 +153,19 @@ def delete_product_view(request, product_id):
     return redirect("inventory:edit_product_view", product_id=product_id)
 
 
-
-
 # -------------------
 # Category Views
 # -------------------
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def category_list(request):
     categories = Category.objects.all().order_by('name')  
     return render(request, 'inventory/category_list.html', {'categories': categories})
 
 
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def add_category(request):
     if request.method == 'POST':
         form = CategoryForm(request.POST)
@@ -170,7 +178,8 @@ def add_category(request):
     return render(request, 'inventory/add_category.html', {'form': form})
 
 
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def edit_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
 
@@ -189,7 +198,8 @@ def edit_category(request, category_id):
     })
     
     
-    
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def delete_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
 
@@ -201,18 +211,19 @@ def delete_category(request, category_id):
     return render(request, 'inventory/delete_category_confirm.html', {'category': category})
 
 
-
-
 # -------------------
 # Supplier Views
 # -------------------
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def supplier_list_view(request):
     suppliers = Supplier.objects.all().order_by('name')
     return render(request, 'inventory/supplier_list.html', {'suppliers': suppliers})
 
 
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def add_supplier_view(request):
     if request.method == 'POST':
         form = SupplierForm(request.POST, request.FILES)
@@ -228,7 +239,8 @@ def add_supplier_view(request):
     return render(request, 'inventory/add_supplier.html', {'form': form})
 
 
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def edit_supplier_view(request, supplier_id):
     supplier = get_object_or_404(Supplier, id=supplier_id)
 
@@ -249,7 +261,8 @@ def edit_supplier_view(request, supplier_id):
     })
     
 
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def delete_supplier_view(request, supplier_id):
     supplier = get_object_or_404(Supplier, id=supplier_id)
 
@@ -261,8 +274,8 @@ def delete_supplier_view(request, supplier_id):
     return render(request, 'inventory/delete_supplier_confirm.html', {'supplier': supplier})
 
 
-
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def supplier_detail_view(request, supplier_id):
     supplier = get_object_or_404(Supplier, id=supplier_id)
     supplier_products = supplier.supplierproduct_set.all()
@@ -291,7 +304,8 @@ def supplier_detail_view(request, supplier_id):
     })
 
 
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def toggle_supplier_product(request, sp_id):
     sp = get_object_or_404(SupplierProduct, id=sp_id)
     if request.method == "POST":
@@ -301,7 +315,8 @@ def toggle_supplier_product(request, sp_id):
     return redirect('inventory:supplier_detail_view', supplier_id=sp.supplier_id)
 
 
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def edit_supplier_product(request, pk):
     supplier_product = get_object_or_404(SupplierProduct, pk=pk)
 
@@ -321,15 +336,15 @@ def edit_supplier_product(request, pk):
 # Stock Views
 # -------------------
 
+@login_required
 def stock_status_view(request):
     products = Product.objects.all().order_by('name')
-    
     return render(request, 'inventory/stock_status.html', {
         'products': products
     })
 
 
-
+@login_required
 def stock_update_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
@@ -351,24 +366,3 @@ def stock_update_view(request, product_id):
     return render(request, 'inventory/stock_update.html', {
         'product': product
     })
-
-
-
-
-# -------------------
-# Reports and Analytics
-# -------------------
-
-
-
-# -------------------
-# Notifications (dummy views for now)
-# -------------------
-
-
-
-# -------------------
-# CSV Import/Export (Bonus)
-# -------------------
-
-
