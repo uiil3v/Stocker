@@ -1,0 +1,78 @@
+ body {
+            background: linear-gradient(120deg, #247564 0%, #1d5e51 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-wrapper {
+            min-height: 95vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        .login-card {
+            background: white;
+            border-radius: 12px;
+            padding: 50px 45px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .login-card h2 {
+            text-align: center;
+            font-weight: 700;
+            color: #247564;
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+        .input-group {
+            width: 100%;
+        }
+        .input-group-text {
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            min-width: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+        .form-control {
+            border: 1px solid #ccc;
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+            width: 100%;
+            font-size: 1rem;
+            padding: 10px 12px;
+        }
+        .btn-login {
+            background-color: #247564;
+            border: none;
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 1.05rem;
+            padding: 10px;
+        }
+        .btn-login:hover {
+            background-color: #1d5e51;
+        }
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(-10px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control {
+            border-color: #247564;
+            background-color: #e0f2f1;
+            color: #247564;
+            box-shadow: none;
+        }
+
+        .alert-error {
+        background-color: #ffe6e6;
+        color: #b30000;
+        border: 1px solid #ffcccc;
+        border-radius: 8px;
+        }

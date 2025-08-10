@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "inventory",
     'cloudinary',
     'cloudinary_storage',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -153,3 +154,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+LOGIN_URL = 'accounts:login' 
+LOGIN_REDIRECT_URL = 'inventory:dashboard_view'  
+LOGOUT_REDIRECT_URL = 'accounts:login'  
