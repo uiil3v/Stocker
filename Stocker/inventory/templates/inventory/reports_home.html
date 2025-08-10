@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reports{% endblock %}
+
+{% block fileStyle %}
+<link rel="stylesheet" href="{% static 'css/reports_home.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="container py-3 min-vh-100">
+    <h2 class="text-center fw-bold mb-4 reports-header m-auto">Reports Dashboard</h2>
+
+    <div class="row g-4">
+
+        <!-- Inventory Reports Card -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 border-success rounded-4">
+                <div class="card-body text-center p-5">
+                    <h3 class="fw-bold mb-4 ">Inventory Reports</h3>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Total Products</small>
+                        <span class="fs-3 fw-bold">{{ stats.total_products }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">
+                            Low Stock 
+                            <span class="text-secondary">(&lt; {{ stats.low_stock_threshold }} units)</span>
+                        </small>
+                        <span class="fs-3 fw-bold text-danger">{{ stats.low_stock }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Expired</small>
+                        <span class="fs-3 fw-bold text-danger">{{ stats.expired }}</span>
+                    </div>
+                    <div class="mb-4">
+                        <small class="text-muted d-block">Near Expiry ({{ stats.near_expiry_days }} days)</small>
+                        <span class="fs-3 fw-bold text-warning">{{ stats.near_expiry }}</span>
+                    </div>
+                    <a href="#" class="btn btn-outline-success px-4 rounded-pill">View</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supplier Reports Card -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 border-success rounded-4">
+                <div class="card-body text-center p-5">
+                    <h3 class="fw-bold mb-4">Supplier Reports</h3>
+                    <p class="text-muted mb-4">View supplier statistics and their products.</p>
+                    <a href="#" class="btn btn-outline-success px-4 rounded-pill">View</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

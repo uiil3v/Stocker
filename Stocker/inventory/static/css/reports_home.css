@@ -1,0 +1,43 @@
+.reports-header {
+  background: repeating-linear-gradient(
+    45deg,
+    #256a5d,
+    #256a5d 10px,
+    #2c7a6e 10px,
+    #2c7a6e 20px
+  );
+  color: white;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+
+    .btn-outline-success {
+        transition: all 0.2s ease;
+    }
+    .btn-outline-success:hover {
+        background-color: #198754;
+        color: #fff;
+        border-color: #198754;
+    }
+
+    .card {
+    background-color: #f0fff7; 
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}

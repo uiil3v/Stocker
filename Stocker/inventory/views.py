@@ -4,9 +4,15 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Product, Category, Supplier, SupplierProduct
 from .forms import ProductForm, CategoryForm, SupplierForm, SupplierProductForm
-from django.db.models import Q
+from django.db.models import Q, F, Count
+from django.utils import timezone
+from datetime import timedelta
 from django.core.paginator import Paginator
+from .utils import get_stock_stats, LOW_STOCK_THRESHOLD
 import csv
+
+
+
 
 # صلاحيات المسؤول
 def is_admin(user):
@@ -337,7 +343,8 @@ def edit_supplier_product(request, pk):
 def stock_status_view(request):
     products = Product.objects.all().order_by('name')
     return render(request, 'inventory/stock_status.html', {
-        'products': products
+        'products': products,
+        'low_stock_threshold': LOW_STOCK_THRESHOLD,
     })
 
 
@@ -363,3 +370,14 @@ def stock_update_view(request, product_id):
     return render(request, 'inventory/stock_update.html', {
         'product': product
     })
+
+
+# -------------------
+# Reports Views
+# -------------------
+
+def reports_home_view(request):
+    context = {
+        "stats": get_stock_stats()
+    }
+    return render(request, "inventory/reports_home.html", context)

@@ -32,7 +32,7 @@
                 <a href="{% url 'inventory:category_list' %}" class="nav-link"><i class="fas fa-tags"></i><span>Categories</span></a>
                 <a href="{% url 'inventory:supplier_list_view' %}" class="nav-link"><i class="fas fa-truck"></i><span>Suppliers</span></a>
                 <a href="{% url 'inventory:stock_status_view' %}" class="nav-link"><i class="fas fa-warehouse"></i><span>Stock</span></a>
-                <a href="#" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports</span></a>
+                <a href="{% url 'inventory:reports_home' %}" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports</span></a>
             </nav>
             <div>
                 <a href="#" class="nav-link"><i class="fas fa-cog"></i><span>Settings</span></a>
@@ -95,7 +95,7 @@
                             <a href="{% url 'inventory:category_list' %}" class="nav-link fs-4"><i class="fas fa-tags me-2"></i> Categories</a>
                             <a href="{% url 'inventory:supplier_list_view' %}" class="nav-link fs-4"><i class="fas fa-truck me-2"></i> Suppliers</a>
                             <a href="{% url 'inventory:stock_status_view' %}" class="nav-link fs-4"><i class="fas fa-warehouse me-2"></i> Stock</a>
-                            <a href="#" class="nav-link fs-4"><i class="fas fa-chart-line me-2"></i> Reports</a>
+                            <a href="{% url 'inventory:reports_home' %}" class="nav-link fs-4"><i class="fas fa-chart-line me-2"></i> Reports</a>
                         </nav>
                         <div>
                             <hr>

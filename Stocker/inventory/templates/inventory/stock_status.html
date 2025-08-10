@@ -48,7 +48,7 @@
                     <td>
                         {% if product.quantity_in_stock == 0 %}
                         <span class="badge bg-danger">Out of Stock</span>
-                        {% elif product.quantity_in_stock <= 10 %}
+                        {% elif product.quantity_in_stock < low_stock_threshold %}
                         <span class="badge bg-warning text-dark">Low Stock</span>
                         {% else %}
                         <span class="badge bg-success">In Stock</span>

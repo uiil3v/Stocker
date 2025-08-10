@@ -33,6 +33,10 @@ urlpatterns = [
     # Stock URLs
     path('stock_status/', views.stock_status_view, name='stock_status_view'),
     path('stock_update/<int:product_id>/', views.stock_update_view, name='stock_update_view'),
+    
+    # Reports URLs
+    path("reports/", views.reports_home_view, name="reports_home"),
+
 
 
     
