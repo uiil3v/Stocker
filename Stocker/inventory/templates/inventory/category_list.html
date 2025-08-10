@@ -22,11 +22,13 @@
     </div>
     {% endif %}
 
+    {% if request.user.is_staff %}
     <div class="mb-4 text-end">
         <a href="{% url 'inventory:add_category' %}" class="btn btn-success rounded-pill px-4 py-2 btn-sm btn-md-lg">
             + Add New Category
         </a>
     </div>
+    {% endif %}
 
     <h2 class="text-center fw-bold mb-3 category-header">Categories List</h2>
 
@@ -38,7 +40,9 @@
                     <th scope="col">#</th>
                     <th scope="col">Category Name</th>
                     <th scope="col">Description</th>
+                    {% if request.user.is_staff %}
                     <th scope="col" class="text-center">Actions</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -47,6 +51,7 @@
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ category.name }}</td>
                     <td>{{ category.description|default:"-" }}</td>
+                    {% if request.user.is_staff %}
                     <td class="text-center">
                         <div class="d-flex flex-wrap justify-content-center gap-2">
                             <a href="{% url 'inventory:edit_category' category.id %}"
@@ -60,6 +65,7 @@
                             </form>
                         </div>
                     </td>
+                    {% endif %}
 
                 </tr>
                 {% endfor %}

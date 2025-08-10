@@ -57,8 +57,10 @@
                             <th>Last Supplied</th>
                             <th>Min Order Qty</th>
                             <th>Status</th>
+                            {% if request.user.is_staff %}
                             <th>Action</th>
                             <th>Edit</th> 
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -76,6 +78,7 @@
                                     <span class="badge bg-danger">Inactive</span>
                                 {% endif %}
                             </td>
+                            {% if request.user.is_staff %}
                             <td>
                                 <form method="POST" action="{% url 'inventory:toggle_supplier_product' sp.id %}" class="d-inline">
                                     {% csrf_token %}
@@ -91,6 +94,7 @@
                                     Edit
                                 </a>
                             </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -109,6 +113,7 @@
         {% endfor %}
     </div>
     {% endif %}
+    {% if request.user.is_staff %}
     <div class="card shadow-sm">
         <div class="card-header bg-success text-white fw-bold">
             Link New Product to Supplier
@@ -187,5 +192,6 @@
             </form>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

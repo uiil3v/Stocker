@@ -25,11 +25,13 @@
     </div>
     {% endif %}
 
+    {% if request.user.is_staff %}
     <div class="text-end mb-4">
         <a href="{% url 'inventory:add_product_view' %}" class="btn btn-success rounded-pill px-4 py-2 btn-sm btn-md-lg">
             + Add New Product
         </a>
     </div>
+    {% endif %}
 
 
     <h2 class="text-center fw-bold mb-4 products-header m-auto">Products List</h2>
@@ -91,9 +93,11 @@
                         <a href="{% url 'inventory:product_detail_view' product.id %}" class="btn btn-outline-success w-100 mb-2">
                             View Detail
                         </a>
+                        {% if request.user.is_staff %}
                         <a href="{% url 'inventory:edit_product' product.id %}" class="btn btn-outline-primary w-100">
                             Edit Product
                         </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

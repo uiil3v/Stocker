@@ -133,7 +133,9 @@
     <div class="card-footer d-flex justify-content-between">
       <a href="{% url 'inventory:products_list_view' %}" class="btn btn-outline-secondary">← Back to Products</a>
       <div class="d-flex gap-2">
+        {% if request.user.is_staff %}
         <a href="{% url 'inventory:edit_product' product.id %}" class="btn btn-primary">Edit Product</a>
+        {% endif %}
       </div>
     </div>
   </div>

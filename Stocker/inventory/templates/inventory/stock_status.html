@@ -33,7 +33,9 @@
                     <th>Category</th>
                     <th>Stock Quantity</th>
                     <th>Status</th>
+                    {% if request.user.is_staff %}
                     <th class="text-center">Actions</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -52,11 +54,13 @@
                         <span class="badge bg-success">In Stock</span>
                         {% endif %}
                     </td>
+                    {% if request.user.is_staff %}
                     <td class="text-center">
                         <a href="{% url 'inventory:stock_update_view' product.id %}" class="btn btn-outline-primary btn-sm px-3">
                             Update Stock
                         </a>
                     </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>

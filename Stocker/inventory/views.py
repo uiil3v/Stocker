@@ -158,7 +158,6 @@ def delete_product_view(request, product_id):
 # -------------------
 
 @login_required
-@user_passes_test(lambda u: u.is_staff)
 def category_list(request):
     categories = Category.objects.all().order_by('name')  
     return render(request, 'inventory/category_list.html', {'categories': categories})
@@ -216,7 +215,6 @@ def delete_category(request, category_id):
 # -------------------
 
 @login_required
-@user_passes_test(lambda u: u.is_staff)
 def supplier_list_view(request):
     suppliers = Supplier.objects.all().order_by('name')
     return render(request, 'inventory/supplier_list.html', {'suppliers': suppliers})
@@ -275,7 +273,6 @@ def delete_supplier_view(request, supplier_id):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_staff)
 def supplier_detail_view(request, supplier_id):
     supplier = get_object_or_404(Supplier, id=supplier_id)
     supplier_products = supplier.supplierproduct_set.all()
