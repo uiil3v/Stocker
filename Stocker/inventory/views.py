@@ -8,7 +8,9 @@ from django.db.models import Q, F, Count
 from django.utils import timezone
 from datetime import timedelta
 from django.core.paginator import Paginator
-from .utils import get_stock_stats, LOW_STOCK_THRESHOLD, NEAR_EXPIRY_DAYS, get_supplier_stats
+from .utils import get_stock_stats, LOW_STOCK_THRESHOLD, NEAR_EXPIRY_DAYS, get_supplier_stats, check_and_send_inventory_alerts
+from django.core.mail import EmailMessage
+from django.conf import settings
 import csv
 
 
@@ -96,6 +98,7 @@ def add_product_view(request: HttpRequest):
             try:
                 form.save()
                 messages.success(request, "Product added successfully.")
+                check_and_send_inventory_alerts("sknalyami@gmail.com")
                 return redirect("inventory:products_list_view")  
             except Exception as e:
                 print("❌ Error during form.save():", e)
@@ -128,6 +131,7 @@ def edit_product_view(request: HttpRequest, product_id: int):
             try:
                 form.save()
                 messages.success(request, "Product updated successfully.")
+                check_and_send_inventory_alerts("sknalyami@gmail.com")
                 return redirect("inventory:products_list_view")  
             except Exception as e:
                 print("❌ Error during form.save():", e)
@@ -349,6 +353,7 @@ def stock_status_view(request):
         'low_stock_threshold': LOW_STOCK_THRESHOLD,
     })
 
+
 @login_required
 def stock_update_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -363,11 +368,10 @@ def stock_update_view(request, product_id):
             previous_quantity = product.quantity_in_stock
             quantity_change = new_quantity - previous_quantity
 
-            # تحديث الكمية
             product.quantity_in_stock = new_quantity
             product.save()
 
-            # تسجيل الحركة
+
             StockMovement.objects.create(
                 product=product,
                 movement_type=movement_type,
@@ -379,10 +383,11 @@ def stock_update_view(request, product_id):
             )
 
             today = timezone.localdate()
-            if 0 < product.quantity_in_stock < LOW_STOCK_THRESHOLD:
-                messages.warning(request, f"⚠ {product.name} is now Low Stock ({product.quantity_in_stock} units left).")
+
             if product.expiry_date and today <= product.expiry_date <= today + timezone.timedelta(days=get_stock_stats()['near_expiry_days']):
                 messages.warning(request, f"⏳ {product.name} is Near Expiry on {product.expiry_date}.")
+
+            check_and_send_inventory_alerts("sknalyami@gmail.com")
 
             messages.success(request, "Stock quantity updated successfully.")
             return redirect('inventory:stock_status_view')
@@ -396,6 +401,7 @@ def stock_update_view(request, product_id):
         'form': form,
         'low_stock_threshold': LOW_STOCK_THRESHOLD
     })
+    
     
     
 @login_required
