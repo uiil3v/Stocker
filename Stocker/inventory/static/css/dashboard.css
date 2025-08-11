@@ -98,7 +98,7 @@ body {
 }
 
 .table-header {
-    background: linear-gradient(135deg, var(--gray-800), var(--gray-600));
+    background: linear-gradient(135deg,rgb(254, 56, 56), rgb(254, 133, 133) );
     color: white;
     padding: 1.2rem 2rem;
     font-weight: 700;
@@ -158,3 +158,5 @@ body {
     border-radius: 50%;
     font-size: 1.8rem;
 }
+
+

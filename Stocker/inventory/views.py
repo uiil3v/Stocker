@@ -17,6 +17,8 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 import tempfile
 from io import BytesIO
+import json
+
 
 
 
@@ -34,9 +36,36 @@ def is_admin(user):
 # Product Views
 # -------------------
 
+
 @login_required
 def dashboard_view(request):
-    return render(request, "inventory/dashboard.html")
+    stock_stats = get_stock_stats()
+    supplier_stats = get_supplier_stats()
+
+    low_stock_products = Product.objects.filter(
+        quantity_in_stock__lt=LOW_STOCK_THRESHOLD,
+        quantity_in_stock__gt=0
+    ).select_related("category")
+
+    category_data = Category.objects.annotate(total=Count("products"))
+    category_labels = [cat.name for cat in category_data]
+    category_counts = [cat.total for cat in category_data]
+
+    in_stock = Product.objects.filter(quantity_in_stock__gte=LOW_STOCK_THRESHOLD).count()
+    low_stock = stock_stats["low_stock"]
+    expired = stock_stats["expired"]
+
+    context = {
+        "products_count": stock_stats["total_products"],
+        "categories_count": Category.objects.count(),
+        "suppliers_count": supplier_stats["total_suppliers"],
+        "low_stock_products": low_stock_products,
+        "category_labels": json.dumps(category_labels),
+        "category_counts": json.dumps(category_counts),
+        "stock_status_labels": json.dumps(["In Stock", "Low Stock", "Expired"]),
+        "stock_status_counts": json.dumps([in_stock, low_stock, expired]),
+    }
+    return render(request, "inventory/dashboard.html", context)
 
 
 @login_required

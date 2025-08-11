@@ -5,12 +5,10 @@
 
 {% block fileStyle %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid p-4">
-
 
     {% if messages %}
     <div class="container-fluid mb-4">
@@ -34,7 +32,7 @@
             <div class="stats-card primary d-flex justify-content-between align-items-center">
                 <div>
                     <div class="stats-label">Total Products</div>
-                    <div class="stats-number counter-animation">{{ products_count }}</div>
+                    <div class="stats-number">{{ products_count }}</div>
                 </div>
                 <div class="stats-icon"><i class="fas fa-box"></i></div>
             </div>
@@ -43,7 +41,7 @@
             <div class="stats-card success d-flex justify-content-between align-items-center">
                 <div>
                     <div class="stats-label">Categories</div>
-                    <div class="stats-number counter-animation">{{ categories_count }}</div>
+                    <div class="stats-number">{{ categories_count }}</div>
                 </div>
                 <div class="stats-icon"><i class="fas fa-tags"></i></div>
             </div>
@@ -52,7 +50,7 @@
             <div class="stats-card info d-flex justify-content-between align-items-center">
                 <div>
                     <div class="stats-label">Suppliers</div>
-                    <div class="stats-number counter-animation">{{ suppliers_count }}</div>
+                    <div class="stats-number">{{ suppliers_count }}</div>
                 </div>
                 <div class="stats-icon"><i class="fas fa-truck"></i></div>
             </div>
@@ -61,11 +59,45 @@
             <div class="stats-card danger d-flex justify-content-between align-items-center">
                 <div>
                     <div class="stats-label">Low Stock Alert</div>
-                    <div class="stats-number counter-animation">{{ low_stock_products|length }}</div>
+                    <div class="stats-number">{{ low_stock_products|length }}</div>
                 </div>
                 <div class="stats-icon"><i class="fas fa-exclamation-triangle"></i></div>
             </div>
         </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mt-2 g-4">
+       <!-- Products by Category -->
+        <div class="col-md-6">
+            <div class="stats-card chart-card-category shadow-sm p-3" style="height: 280px;">
+                <div class="mb-2 fw-bold fs-6">Products by Category</div>
+                <div class="row h-100">
+                    <div class="col-7 d-flex align-items-start">
+                        <canvas id="categoryChart" style="max-width: 100%; max-height: 220px;"></canvas>
+                    </div>
+                    <div class="col-5">
+                        <ul id="categoryLegend" class="list-unstyled m-0" style="font-size: 0.9rem; max-height: 200px; overflow-y: auto;"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Status -->
+        <div class="col-md-6">
+            <div class="stats-card chart-card-stock shadow-sm p-3" style="height: 280px;">
+                <div class="mb-2 fw-bold fs-6">Stock Status</div>
+                <div class="row h-100">
+                    <div class="col-7 d-flex align-items-center">
+                        <canvas id="stockChart" style="max-width: 100%; max-height: 220px;"></canvas>
+                    </div>
+                    <div class="col-5">
+                        <ul id="stockLegend" class="list-unstyled m-0" style="font-size: 0.8rem; max-height: 200px; overflow-y: auto;"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Low Stock Table -->
@@ -76,7 +108,7 @@
         </div>
 
         {% if low_stock_products %}
-        <div class="table-responsive">
+        <div class="table-responsive text-center">
             <table class="table custom-table">
                 <thead>
                     <tr>
@@ -90,12 +122,20 @@
                     {% for product in low_stock_products %}
                     <tr>
                         <td>{{ product.name }}</td>
-                        <td><span class="badge badge-custom badge-secondary">{{ product.category.name }}</span></td>
-                        <td><span class="badge badge-custom badge-danger">{{ product.stock }}</span></td>
                         <td>
-                            <button class="btn btn-outline-primary btn-sm">
+                            <span class="badge badge-custom badge-secondary">
+                                {{ product.category.name }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge badge-custom badge-danger">
+                                {{ product.quantity_in_stock }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'inventory:stock_update_view' product.id %}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-plus me-1"></i> Restock
-                            </button>
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -114,26 +154,74 @@
     </div>
 </div>
 
-<script>
-    // Animate numbers
-    document.addEventListener('DOMContentLoaded', function () {
-        const counters = document.querySelectorAll('.counter-animation');
-        counters.forEach(counter => {
-            const target = parseInt(counter.innerText);
-            let current = 0;
-            const step = Math.ceil(target / 30);
 
-            const interval = setInterval(() => {
-                current += step;
-                if (current >= target) {
-                    counter.innerText = target;
-                    clearInterval(interval);
-                } else {
-                    counter.innerText = current;
-                }
-            }, 30);
-        });
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const colorsCategory = ['#2563eb', '#16a34a', '#f97316', '#dc2626', '#0891b2'];
+    const colorsStock = ['#16a34a', '#facc15', '#dc2626'];
+
+    const categoryLabels = JSON.parse('{{ category_labels|escapejs }}');
+    const categoryCounts = JSON.parse('{{ category_counts|escapejs }}');
+
+    const categoryChart = new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryCounts,
+                backgroundColor: colorsCategory,
+                borderWidth: 1
+            }]
+        },
+        options: { 
+            responsive: true,
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            layout: { padding: 20 }
+        }
+    });
+
+
+    const categoryLegend = document.getElementById('categoryLegend');
+    categoryLabels.forEach((label, index) => {
+        categoryLegend.innerHTML += `
+            <li class="mb-1">
+                <span style="display:inline-block;width:12px;height:12px;background:${colorsCategory[index]};margin-right:6px;border-radius:2px;"></span>
+                ${label} (${categoryCounts[index]})
+            </li>
+        `;
+    });
+
+    const stockLabels = JSON.parse('{{ stock_status_labels|escapejs }}');
+    const stockCounts = JSON.parse('{{ stock_status_counts|escapejs }}');
+
+    const stockChart = new Chart(document.getElementById('stockChart'), {
+        type: 'bar',
+        data: {
+            labels: stockLabels,
+            datasets: [{
+                label: 'Number of Products',
+                data: stockCounts,
+                backgroundColor: colorsStock,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    const stockLegend = document.getElementById('stockLegend');
+    stockLabels.forEach((label, index) => {
+        stockLegend.innerHTML += `
+            <li class="mb-1">
+                <span style="display:inline-block;width:12px;height:12px;background:${colorsStock[index]};margin-right:6px;border-radius:2px;"></span>
+                ${label} (${stockCounts[index]})
+            </li>
+        `;
     });
 </script>
-
 {% endblock %}
