@@ -14,6 +14,7 @@ import csv
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from io import BytesIO
+import io
 import json
 
 
@@ -85,7 +86,7 @@ def products_list_view(request):
     if supplier_id and supplier_id.isdigit():
         products = products.filter(suppliers__id=supplier_id)
 
-    paginator   = Paginator(products, 9)
+    paginator   = Paginator(products, 8)
     page_number = request.GET.get("page")
     page_obj    = paginator.get_page(page_number)
 
@@ -98,6 +99,130 @@ def products_list_view(request):
         "selected_supplier": supplier_id,  
     }
     return render(request, "inventory/products_list.html", context)
+
+
+@login_required
+def export_products_csv_view(request):
+
+    products = Product.objects.select_related('category').prefetch_related('suppliers').order_by("-created_at")
+
+    search_query = request.GET.get("search") or ""
+    category_id = request.GET.get("category")
+    supplier_id = request.GET.get("supplier")
+
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+
+    if category_id and category_id.isdigit():
+        products = products.filter(category_id=category_id)
+
+    if supplier_id and supplier_id.isdigit():
+        products = products.filter(suppliers__id=supplier_id)
+
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="products.csv"'
+
+    writer = csv.writer(response)
+
+    writer.writerow([
+        "SKU",
+        "Name",
+        "Category",
+        "Suppliers",
+        "Quantity In Stock",
+        "Expiry Date",
+        "Batch Number",
+        "Dosage Form",
+        "Strength",
+        "Price"
+    ])
+
+
+    for product in products:
+        suppliers_names = ", ".join([s.name for s in product.suppliers.all()])
+        writer.writerow([
+            product.sku or "",
+            product.name,
+            product.category.name if product.category else "",
+            suppliers_names,
+            product.quantity_in_stock,
+            product.expiry_date if product.expiry_date else "",
+            product.batch_number or "",
+            product.get_dosage_form_display() if product.dosage_form else "",
+            product.strength or "",
+            product.price if product.price is not None else ""
+        ])
+
+    return response
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def import_products_csv_view(request):
+    if request.method == "POST":
+        try:
+            csv_file = request.FILES.get("file")
+            if not csv_file:
+                messages.error(request, "Please upload a CSV file.")
+                return redirect("inventory:products_list_view")
+
+
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, "Only CSV files are allowed.")
+                return redirect("inventory:products_list_view")
+
+
+            data_set = csv_file.read().decode('UTF-8')
+            io_string = io.StringIO(data_set)
+            next(io_string)
+
+            for row in csv.reader(io_string, delimiter=',', quotechar='"'):
+                name = row[0].strip()
+                category_name = row[1].strip() if row[1] else None
+                suppliers_names = row[2].split(",") if row[2] else []
+                quantity = int(row[3]) if row[3] else 0
+                expiry_date = row[4].strip() if row[4] else None
+                batch_number = row[5].strip() if row[5] else None
+                dosage_form = row[6].strip() if row[6] else None
+                strength = row[7].strip() if row[7] else None
+                price = row[8].strip() if row[8] else None
+
+
+                category = None
+                if category_name:
+                    category, _ = Category.objects.get_or_create(name=category_name)
+
+                product = Product.objects.create(
+                    name=name,
+                    category=category,
+                    quantity_in_stock=quantity,
+                    batch_number=batch_number,
+                    dosage_form=dosage_form,
+                    strength=strength,
+                    price=price if price else None,
+                    expiry_date=expiry_date if expiry_date else None
+                )
+
+
+                for sup_name in suppliers_names:
+                    sup_name = sup_name.strip()
+                    if sup_name:
+                        supplier, _ = Supplier.objects.get_or_create(name=sup_name)
+                        SupplierProduct.objects.create(supplier=supplier, product=product)
+
+            check_and_send_inventory_alerts()
+            messages.success(request, "Products imported successfully.")
+        except Exception as e:
+            messages.error(request, f"Error importing CSV: {str(e)}")
+
+        return redirect("inventory:products_list_view")
+
+    return render(request, "inventory/import_products.html")
+
 
 
 @login_required

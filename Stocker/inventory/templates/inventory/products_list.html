@@ -26,12 +26,28 @@
     {% endif %}
 
     {% if request.user.is_staff %}
-    <div class="text-end mb-4">
-        <a href="{% url 'inventory:add_product_view' %}" class="btn btn-success rounded-pill px-4 py-2 btn-sm btn-md-lg">
+    <div class="d-flex justify-content-between mb-4">
+        <a href="{% url 'inventory:export_products_csv_view' %}?search={{ search_query }}&category={{ selected_category }}&supplier={{ selected_supplier }}" 
+        class="btn btn-primary rounded-pill px-4 py-2 btn-sm btn-md-lg">
+            ⬇ Download CSV
+        </a>
+
+
+        <a href="{% url 'inventory:import_products_csv_view' %}" 
+        class="btn btn-warning rounded-pill px-4 py-2 btn-sm btn-md-lg">
+            ⬆ Import CSV
+        </a>
+
+
+        <a href="{% url 'inventory:add_product_view' %}" 
+        class="btn btn-success rounded-pill px-4 py-2 btn-sm btn-md-lg">
             + Add New Product
         </a>
     </div>
+
     {% endif %}
+
+
 
 
     <h2 class="text-center fw-bold mb-4 products-header m-auto">Products List</h2>

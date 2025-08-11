@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Import Products{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">Import Products from CSV</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="file" class="form-label">Select CSV file</label>
+            <input type="file" name="file" class="form-control" accept=".csv" required>
+        </div>
+        <button type="submit" class="btn btn-success">Upload</button>
+        <a href="{% url 'inventory:products_list_view' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
