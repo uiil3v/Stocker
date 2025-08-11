@@ -234,3 +234,18 @@ body{
 
 
 
+
+
+
+.fade-load {
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeLoad 0.8s ease-out forwards;
+}
+
+@keyframes fadeLoad {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
