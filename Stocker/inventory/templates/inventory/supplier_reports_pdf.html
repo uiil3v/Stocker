@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Supplier Report</title>
+    <link rel="stylesheet" href="{% static 'css/supplier_reports.css' %}">
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
+        h2 { text-align: center; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+        th { background-color: #2e7d32; color: white; }
+        .text-warning { color: orange; }
+        .text-danger { color: red; }
+        .text-info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+
+<h2>Supplier Report</h2>
+<p><strong>Date:</strong> {{ today }}</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Supplier</th>
+            <th>Total Products</th>
+            <th>Low Stock (< {{ low_stock_threshold }} units)</th>
+            <th>Expired</th>
+            <th>Near Expiry ({{ near_expiry_days }} days)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in suppliers_data %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ data.supplier.name }}</td>
+                <td>{{ data.total_products }}</td>
+                <td class="text-warning">{{ data.low_stock_count }}</td>
+                <td class="text-danger">{{ data.expired_count }}</td>
+                <td class="text-info">{{ data.near_expiry_count }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="6">No suppliers found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
