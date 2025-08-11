@@ -36,14 +36,14 @@
 
     <h2 class="text-center fw-bold mb-4 products-header m-auto">Products List</h2>
 
-    <!-- Filter Form -->
+
     <form method="GET" class="row g-3 mb-5 justify-content-center align-items-center">
         <div class="col-12 col-md-6">
             <input type="text" name="search" class="form-control" placeholder="Search by product name..."
                 value="{{ search_query }}">
         </div>
 
-        <!-- Category -->
+
 <div class="col-6 col-md-2">
     <select class="form-select" name="category">
         <option value="">Categories</option>
@@ -55,7 +55,6 @@
     </select>
 </div>
 
-<!-- Supplier -->
 <div class="col-6 col-md-2">
     <select class="form-select" name="supplier">
         <option value="">Suppliers</option>
@@ -68,14 +67,14 @@
 </div>
 
 
-        <!-- Button -->
+
         <div class="col-12 col-md-2">
             <button type="submit" class="btn btn-success w-100">Search</button>
         </div>
     </form>
 
 
-    <!-- Products List -->
+
     <div class="row g-4 justify-content-center">
         {% for product in products %}
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -107,7 +106,7 @@
         {% endfor %}
     </div>
 
-    <!-- Pagination -->
+
     {% if products.has_other_pages %}
     <div class="d-flex justify-content-center mt-5">
         <nav>

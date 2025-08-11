@@ -1,4 +1,4 @@
-/* تركيز الحقول داخل نموذج الفلترة */
+
 form input:focus,
 form select:focus {
   border-color: #247564 !important;
@@ -6,7 +6,7 @@ form select:focus {
   outline: none !important;
 }
 
-/* أزرار الترقيم */
+
 .pagination .page-link {
   color: #247564;
 }

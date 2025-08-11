@@ -11,6 +11,7 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = '__all__'
+     
         
 class SupplierForm(forms.ModelForm):
     class Meta:
@@ -35,7 +36,6 @@ class SupplierProductForm(forms.ModelForm):
             self.fields['product'].queryset = Product.objects.exclude(
                 supplierproduct__supplier=supplier
             )
-
 
 
 class StockUpdateForm(forms.Form):

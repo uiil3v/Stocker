@@ -36,7 +36,6 @@ urlpatterns = [
     path('movements/', views.stock_movements_view, name='stock_movements_view'),
     path('products/<int:product_id>/movements/', views.product_movements_view, name='product_movements_view'),
     
-    
     # Reports URLs
     path("reports/", views.reports_home_view, name="reports_home"),
     path("reports/inventory/", views.inventory_reports_view, name="inventory_reports_view"),

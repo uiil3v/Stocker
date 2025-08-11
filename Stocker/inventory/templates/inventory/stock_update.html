@@ -34,7 +34,7 @@
             <form method="POST">
                 {% csrf_token %}
 
-                <!-- Movement Type -->
+
                 <div class="mb-4">
                     <label for="id_movement_type" class="form-label fw-bold">Movement Type</label>
                     <select name="movement_type" id="id_movement_type" class="form-control bg-light rounded-3" required>
@@ -44,7 +44,7 @@
                     </select>
                 </div>
 
-                <!-- Quantity -->
+ 
                 <div class="mb-4">
                     <label for="id_quantity" class="form-label fw-bold">New Quantity</label>
                     <input type="number" name="quantity" id="id_quantity" min="0"
@@ -52,7 +52,7 @@
                            placeholder="Enter the new quantity" required>
                 </div>
 
-                <!-- Reason -->
+  
                 <div class="mb-4">
                     <label for="id_reason" class="form-label fw-bold">Reason</label>
                     <textarea name="reason" id="id_reason" rows="3"

@@ -16,7 +16,7 @@
 
     <div class="card-body">
       <div class="row g-4">
-        <!-- Image -->
+
         <div class="col-md-4">
           <div class="ratio ratio-1x1 border rounded-3 d-flex align-items-center justify-content-center bg-light">
             {% if product.image %}
@@ -27,7 +27,7 @@
           </div>
         </div>
 
-        <!-- Fields -->
+
         <div class="col-md-8">
           <div class="row g-3">
             <div class="col-12">
@@ -55,7 +55,7 @@
               <div class="form-control bg-light border-0 p-3">{{ product.quantity_in_stock|default:"—" }}</div>
             </div>
 
-            <!-- Optional medicine fields (لو موجودة في الموديل) -->
+
             {% if product.expiry_date or product.batch_number or product.dosage_form or product.strength %}
               <div class="col-12"><hr class="my-2"><h6 class="fw-bold">Medicine Info</h6></div>
 
@@ -84,7 +84,7 @@
               </div>
             </div>
 
-            <!-- Suppliers via through model -->
+
             {% if supplier_products %}
               <div class="col-12">
                 <hr class="my-2">

@@ -10,6 +10,8 @@ from django.contrib.auth.models import User
 LOW_STOCK_THRESHOLD = 100
 NEAR_EXPIRY_DAYS = 30
 
+
+
 def get_stock_stats():
     today = timezone.localdate()
 
@@ -68,8 +70,6 @@ def get_supplier_stats():
         "suppliers_with_expired": suppliers_with_expired,
         "low_stock_threshold": LOW_STOCK_THRESHOLD
     }
-   
-   
    
  
 def check_and_send_inventory_alerts():

@@ -39,7 +39,7 @@ body {
     margin: 0;
 }
 
-/* ===== Stats Cards ===== */
+
 .stats-card {
     background: white;
     border-left: 4px solid;
@@ -88,7 +88,7 @@ body {
     color: var(--gray-800);
 }
 
-/* ===== Table ===== */
+
 .table-container {
     background: white;
     border-radius: 12px;
@@ -139,7 +139,7 @@ body {
     color: var(--danger-color);
 }
 
-/* ===== Empty State ===== */
+
 .empty-state {
     padding: 3rem;
     text-align: center;

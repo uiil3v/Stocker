@@ -27,7 +27,7 @@
         {% csrf_token %}
         <div class="row g-3">
 
-          <!-- Product (عرض فقط) -->
+
           <div class="col-md-6">
             <label class="form-label text-uppercase small fw-bold">Product</label>
             <select class="form-select bg-light rounded-3 border-0 p-3" disabled>
@@ -38,7 +38,7 @@
             {% endif %}
           </div>
 
-          <!-- Unit Cost -->
+
           <div class="col-md-6">
             <label for="id_unit_cost" class="form-label text-uppercase small fw-bold">Unit Cost</label>
             <input
@@ -56,7 +56,7 @@
             {% endif %}
           </div>
 
-          <!-- Lead Time (Days) -->
+  
           <div class="col-md-6">
             <label for="id_lead_time_days" class="form-label text-uppercase small fw-bold">Lead Time (Days)</label>
             <input
@@ -73,7 +73,7 @@
             {% endif %}
           </div>
 
-          <!-- Last Supplied -->
+
           <div class="col-md-6">
             <label for="id_last_supplied" class="form-label text-uppercase small fw-bold">Last Supplied</label>
             <input
@@ -88,7 +88,7 @@
             {% endif %}
           </div>
 
-          <!-- Min Order Qty -->
+
           <div class="col-md-6">
             <label for="id_min_order_qty" class="form-label text-uppercase small fw-bold">Min Order Qty</label>
             <input
@@ -105,7 +105,7 @@
             {% endif %}
           </div>
 
-          <!-- Status -->
+
         <div class="col-md-6">
         <label for="id_is_active" class="form-label text-uppercase small fw-bold">Status</label>
         {% with val=form.is_active.value|default_if_none:supplier_product.is_active %}
