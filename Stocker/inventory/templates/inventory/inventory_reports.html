@@ -5,16 +5,45 @@
 
 {% block fileStyle %}
 <link rel="stylesheet" href="{% static 'css/inventory_reports.css' %}">
-<style>
-    
-</style>
 {% endblock %}
 
 {% block content %}
 <div class="container pb-5 pt-4 min-vh-100">
-    <h2 class="text-center fw-bold mb-5 inventory-reports-header m-auto">Inventory Reports</h2>
 
-    <!-- Low Stock -->
+
+
+
+
+    <h2 class="text-center fw-bold mb-3 inventory-reports-header m-auto">Inventory Reports</h2>
+
+        <form method="GET" class="row mb-5">
+        <div class="col-md-3">
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+                {% for c in categories %}
+                    <option value="{{ c.id }}" {% if selected_category == c.id|stringformat:"s" %}selected{% endif %}>
+                        {{ c.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">All Status</option>
+                <option value="low" {% if selected_status == "low" %}selected{% endif %}>Low Stock</option>
+                <option value="expired" {% if selected_status == "expired" %}selected{% endif %}>Expired</option>
+                <option value="near" {% if selected_status == "near" %}selected{% endif %}>Near Expiry</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="Search product..." value="{{ search_query }}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">Apply</button>
+        </div>
+    </form>
+
+
     <div class="report-card mb-4">
         <div class="report-header header-green-light d-flex justify-content-between align-items-center">
             <span>Low Stock (&lt; {{ low_stock_threshold }} units)</span>
@@ -48,7 +77,7 @@
         </div>
     </div>
 
-    <!-- Expired -->
+
     <div class="report-card mb-4">
         <div class="report-header header-green-dark d-flex justify-content-between align-items-center">
             <span>Expired Products</span>
@@ -82,7 +111,7 @@
         </div>
     </div>
 
-    <!-- Near Expiry -->
+ 
     <div class="report-card mb-3">
         <div class="report-header header-green-light d-flex justify-content-between align-items-center">
             <span>Near Expiry ({{ near_expiry_days }} days)</span>

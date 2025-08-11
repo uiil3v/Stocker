@@ -584,22 +584,39 @@ def reports_home_view(request):
 @login_required
 def inventory_reports_view(request):
     today = timezone.localdate()
+    category_id = request.GET.get("category")
+    status = request.GET.get("status")
+    search_query = request.GET.get("search", "")
 
-    low_stock_products = Product.objects.filter(
-        quantity_in_stock__lt=LOW_STOCK_THRESHOLD,
-        quantity_in_stock__gt=0
-    ).order_by('name')
+    products = Product.objects.all()
 
-    expired_products = Product.objects.filter(
-        expiry_date__isnull=False,
-        expiry_date__lt=today
-    ).order_by('name')
+    if category_id and category_id.isdigit():
+        products = products.filter(category_id=category_id)
 
-    near_expiry_products = Product.objects.filter(
+
+    if status == "low":
+        products = products.filter(quantity_in_stock__lt=LOW_STOCK_THRESHOLD, quantity_in_stock__gt=0)
+    elif status == "expired":
+        products = products.filter(expiry_date__isnull=False, expiry_date__lt=today)
+    elif status == "near":
+        products = products.filter(
+            expiry_date__isnull=False,
+            expiry_date__gte=today,
+            expiry_date__lte=today + timedelta(days=NEAR_EXPIRY_DAYS)
+        )
+
+    if search_query:
+        products = products.filter(name__icontains=search_query)
+
+    low_stock_products = products.filter(quantity_in_stock__lt=LOW_STOCK_THRESHOLD, quantity_in_stock__gt=0)
+    expired_products = products.filter(expiry_date__isnull=False, expiry_date__lt=today)
+    near_expiry_products = products.filter(
         expiry_date__isnull=False,
         expiry_date__gte=today,
         expiry_date__lte=today + timedelta(days=NEAR_EXPIRY_DAYS)
-    ).order_by('name')
+    )
+
+    categories = Category.objects.all()
 
     context = {
         "low_stock_products": low_stock_products,
@@ -607,6 +624,10 @@ def inventory_reports_view(request):
         "near_expiry_products": near_expiry_products,
         "low_stock_threshold": LOW_STOCK_THRESHOLD,
         "near_expiry_days": NEAR_EXPIRY_DAYS,
+        "categories": categories,
+        "selected_category": category_id,
+        "selected_status": status,
+        "search_query": search_query
     }
     return render(request, "inventory/inventory_reports.html", context)
 

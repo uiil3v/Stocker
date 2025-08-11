@@ -59,3 +59,11 @@
         background-color: #d4edda;
         color: #155724;
     }
+
+
+form input:focus,
+form select:focus {
+  border-color: #247564 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
