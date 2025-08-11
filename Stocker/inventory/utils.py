@@ -3,6 +3,9 @@ from django.utils import timezone
 from .models import Product, Supplier
 from django.core.mail import send_mail
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.contrib.auth.models import User
+
 
 LOW_STOCK_THRESHOLD = 100
 NEAR_EXPIRY_DAYS = 30
@@ -65,48 +68,40 @@ def get_supplier_stats():
         "suppliers_with_expired": suppliers_with_expired,
         "low_stock_threshold": LOW_STOCK_THRESHOLD
     }
-    
-    
-def check_and_send_inventory_alerts(recipient_emails):
+   
+   
+   
+ 
+def check_and_send_inventory_alerts():
     today = timezone.localdate()
 
-    # Low Stock
+
+    managers_emails = User.objects.filter(is_staff=True).values_list('email', flat=True)
+    if not managers_emails:
+        return
+
     low_stock_products = Product.objects.filter(
         quantity_in_stock__lt=LOW_STOCK_THRESHOLD,
         quantity_in_stock__gt=0
     )
-
     if low_stock_products.exists():
         subject = f"Low Stock Alert - {low_stock_products.count()} products"
-        product_list = "\n".join([
-            f"{p.name} - {p.quantity_in_stock} units left"
-            for p in low_stock_products
-        ])
-        message = (
-            "The following products are low in stock:\n\n"
-            f"{product_list}\n\n"
-            "Please restock them as soon as possible."
-        )
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient_emails], fail_silently=False)
+        html_message = render_to_string('emails/low_stock.html', {
+            'products': low_stock_products,
+            'date': today
+        })
+        send_mail(subject, "", settings.DEFAULT_FROM_EMAIL, list(managers_emails),
+                  html_message=html_message, fail_silently=False)
 
-    # Expired Products
     expired_products = Product.objects.filter(
         expiry_date__isnull=False,
         expiry_date__lt=today
     )
-
     if expired_products.exists():
         subject = f"Expired Products Alert - {expired_products.count()} products"
-        product_list = "\n".join([
-            f"{p.name} - Expired on {p.expiry_date}"
-            for p in expired_products
-        ])
-        message = (
-            "The following products have expired:\n\n"
-            f"{product_list}\n\n"
-            "Please remove or replace them from the inventory."
-        )
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient_emails], fail_silently=False)
-
-        
-        
+        html_message = render_to_string('emails/expired_products.html', {
+            'products': expired_products,
+            'date': today
+        })
+        send_mail(subject, "", settings.DEFAULT_FROM_EMAIL, list(managers_emails),
+                  html_message=html_message, fail_silently=False)      

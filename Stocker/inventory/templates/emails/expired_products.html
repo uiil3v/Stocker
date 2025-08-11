@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Expired Products Alert</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; }
+        h2 { color: #6f42c1; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f5f5f5; }
+        .footer { margin-top: 20px; font-size: 12px; color: #777; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>⛔ Expired Products Alert</h2>
+        <p>The following products have expired as of {{ date }}:</p>
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Expiry Date</th>
+            </tr>
+            {% for p in products %}
+            <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.expiry_date }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p>Please remove or replace them from the inventory.</p>
+        <div class="footer">
+            Inventory Plus System &copy; {{ date.year }}
+        </div>
+    </div>
+</body>
+</html>

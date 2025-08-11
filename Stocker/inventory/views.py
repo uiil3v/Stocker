@@ -105,7 +105,7 @@ def add_product_view(request: HttpRequest):
             try:
                 form.save()
                 messages.success(request, "Product added successfully.")
-                check_and_send_inventory_alerts("sknalyami@gmail.com")
+                check_and_send_inventory_alerts()
                 return redirect("inventory:products_list_view")  
             except Exception as e:
                 user_info = request.user.username if request.user.is_authenticated else "Anonymous"
@@ -144,7 +144,7 @@ def edit_product_view(request: HttpRequest, product_id: int):
             try:
                 form.save()
                 messages.success(request, "Product updated successfully.")
-                check_and_send_inventory_alerts("sknalyami@gmail.com")
+                check_and_send_inventory_alerts()
                 return redirect("inventory:products_list_view")  
             except Exception as e:
                 user_info = request.user.username if request.user.is_authenticated else "Anonymous"
@@ -517,7 +517,7 @@ def stock_update_view(request, product_id):
                 if product.expiry_date and today <= product.expiry_date <= today + timezone.timedelta(days=get_stock_stats()['near_expiry_days']):
                     messages.warning(request, f"⏳ {product.name} is Near Expiry on {product.expiry_date}.")
 
-                check_and_send_inventory_alerts("sknalyami@gmail.com")
+                check_and_send_inventory_alerts()
 
                 messages.success(request, "Stock quantity updated successfully.")
                 return redirect('inventory:stock_status_view')

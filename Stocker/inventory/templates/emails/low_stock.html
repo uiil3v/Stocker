@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Low Stock Alert</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; }
+        h2 { color: #d9534f; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f5f5f5; }
+        .footer { margin-top: 20px; font-size: 12px; color: #777; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>⚠ Low Stock Alert</h2>
+        <p>The following products are running low in stock as of {{ date }}:</p>
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+            </tr>
+            {% for p in products %}
+            <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.quantity_in_stock }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p>Please restock them as soon as possible.</p>
+        <div class="footer">
+            Inventory Plus System &copy; {{ date.year }}
+        </div>
+    </div>
+</body>
+</html>
