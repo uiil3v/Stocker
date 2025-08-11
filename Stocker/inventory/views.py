@@ -11,9 +11,12 @@ from django.core.paginator import Paginator
 from .utils import get_stock_stats, LOW_STOCK_THRESHOLD, NEAR_EXPIRY_DAYS, get_supplier_stats, check_and_send_inventory_alerts
 from django.core.mail import EmailMessage
 from django.conf import settings
+import logging
 import csv
 
 
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -101,13 +104,22 @@ def add_product_view(request: HttpRequest):
                 check_and_send_inventory_alerts("sknalyami@gmail.com")
                 return redirect("inventory:products_list_view")  
             except Exception as e:
-                print("❌ Error during form.save():", e)
+                user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+                ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+                logger.error(
+                    f"Error during add_product_view by user '{user_info}' from IP {ip_address}: {str(e)}",
+                    exc_info=True
+                )
                 return render(request, "inventory/add_product.html", {
                     "form": form,
-                    "error": f"Something went wrong: {str(e)}"
+                    "error": "Something went wrong while saving the product."
                 })
         else:
-            print("❌ Form validation errors:", form.errors)
+            user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+            ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+            logger.warning(
+                f"Add Product form validation failed by user '{user_info}' from IP {ip_address}: {form.errors}"
+            )
             return render(request, "inventory/add_product.html", {
                 "form": form,
                 "error": "Form validation failed. Please check your inputs."
@@ -116,11 +128,8 @@ def add_product_view(request: HttpRequest):
         form = ProductForm()
     return render(request, "inventory/add_product.html", {"form": form})
 
-
-
 @login_required
 @user_passes_test(lambda u: u.is_staff)
-
 def edit_product_view(request: HttpRequest, product_id: int):
     
     product = get_object_or_404(Product, id=product_id)
@@ -134,23 +143,29 @@ def edit_product_view(request: HttpRequest, product_id: int):
                 check_and_send_inventory_alerts("sknalyami@gmail.com")
                 return redirect("inventory:products_list_view")  
             except Exception as e:
-                print("❌ Error during form.save():", e)
+                user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+                ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+                logger.error(
+                    f"Error during edit_product_view by user '{user_info}' from IP {ip_address}: {str(e)}",
+                    exc_info=True
+                )
                 return render(request, "inventory/edit_product.html", {
                     "form": form,
-                    "error": f"Something went wrong: {str(e)}"
+                    "product": product,
+                    "error": "Something went wrong while updating the product."
                 })
         else:
-            print("❌ Form validation errors:", form.errors)
+            logger.warning(f"Edit Product form validation failed: {form.errors}")
             return render(request, "inventory/edit_product.html", {
                 "form": form,
+                "product": product,
                 "error": "Form validation failed. Please check your inputs."
             })
 
     else:
         form = ProductForm(instance=product)
         return render(request, "inventory/edit_product.html", {"form": form, "product": product})
-
-
+    
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
@@ -158,11 +173,23 @@ def delete_product_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
     if request.method == "POST":
-        product.delete()
-        messages.success(request, "Product deleted successfully.")
-        return redirect("inventory:products_list_view") 
+        try:
+            product.delete()
+            messages.success(request, "Product deleted successfully.")
+            return redirect("inventory:products_list_view")
+        except Exception as e:
+            user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+            ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+            logger.error(
+                f"Error deleting product {product_id} by user '{user_info}' from IP {ip_address}: {str(e)}",
+                exc_info=True
+            )
+            messages.error(request, "Something went wrong while deleting the product.")
+            return redirect("inventory:edit_product_view", product_id=product_id)
 
     return redirect("inventory:edit_product_view", product_id=product_id)
+
+
 
 
 # -------------------
@@ -181,13 +208,29 @@ def add_category(request):
     if request.method == 'POST':
         form = CategoryForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Category added successfully.")
-            return redirect('inventory:category_list')  
+            try:
+                form.save()
+                messages.success(request, "Category added successfully.")
+                return redirect('inventory:category_list')
+            except Exception as e:
+                user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+                ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+                logger.error(
+                    f"Error adding category by user '{user_info}' from IP {ip_address}: {str(e)}",
+                    exc_info=True
+                )
+                messages.error(request, "Something went wrong while adding the category.")
+        else:
+            user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+            ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+            logger.warning(
+                f"Add Category form validation failed by user '{user_info}' from IP {ip_address}: {form.errors}"
+            )
+            messages.error(request, "Form validation failed. Please check your inputs.")
     else:
         form = CategoryForm()
     return render(request, 'inventory/add_category.html', {'form': form})
-
+    
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
@@ -197,9 +240,25 @@ def edit_category(request, category_id):
     if request.method == 'POST':
         form = CategoryForm(request.POST, instance=category)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Category updated successfully.")
-            return redirect('inventory:category_list')  
+            try:
+                form.save()
+                messages.success(request, "Category updated successfully.")
+                return redirect('inventory:category_list')
+            except Exception as e:
+                user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+                ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+                logger.error(
+                    f"Error updating category {category_id} by user '{user_info}' from IP {ip_address}: {str(e)}",
+                    exc_info=True
+                )
+                messages.error(request, "Something went wrong while updating the category.")
+        else:
+            user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+            ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+            logger.warning(
+                f"Edit Category form validation failed by user '{user_info}' from IP {ip_address}: {form.errors}"
+            )
+            messages.error(request, "Form validation failed. Please check your inputs.")
     else:
         form = CategoryForm(instance=category)
 
@@ -215,11 +274,23 @@ def delete_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
 
     if request.method == 'POST':
-        category.delete()
-        messages.success(request, "Category deleted successfully.")
-        return redirect('inventory:category_list')  
+        try:
+            category.delete()
+            messages.success(request, "Category deleted successfully.")
+            return redirect('inventory:category_list')
+        except Exception as e:
+            user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+            ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+            logger.error(
+                f"Error deleting category {category_id} by user '{user_info}' from IP {ip_address}: {str(e)}",
+                exc_info=True
+            )
+            messages.error(request, "Something went wrong while deleting the category.")
+            return redirect('inventory:category_list')
 
     return render(request, 'inventory/delete_category_confirm.html', {'category': category})
+
+
 
 
 # -------------------
@@ -230,58 +301,6 @@ def delete_category(request, category_id):
 def supplier_list_view(request):
     suppliers = Supplier.objects.all().order_by('name')
     return render(request, 'inventory/supplier_list.html', {'suppliers': suppliers})
-
-
-@login_required
-@user_passes_test(lambda u: u.is_staff)
-def add_supplier_view(request):
-    if request.method == 'POST':
-        form = SupplierForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Supplier added successfully.")
-            return redirect('inventory:supplier_list_view')  
-        else:
-            messages.error(request, "Form is invalid. Please correct the errors.")
-    else:
-        form = SupplierForm()
-    
-    return render(request, 'inventory/add_supplier.html', {'form': form})
-
-
-@login_required
-@user_passes_test(lambda u: u.is_staff)
-def edit_supplier_view(request, supplier_id):
-    supplier = get_object_or_404(Supplier, id=supplier_id)
-
-    if request.method == 'POST':
-        form = SupplierForm(request.POST, request.FILES, instance=supplier)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Supplier updated successfully.")
-            return redirect('inventory:supplier_list_view')
-        else:
-            messages.error(request, "Form is invalid. Please correct the errors.")
-    else:
-        form = SupplierForm(instance=supplier)
-
-    return render(request, 'inventory/edit_supplier.html', {
-        'form': form,
-        'supplier': supplier,
-    })
-    
-
-@login_required
-@user_passes_test(lambda u: u.is_staff)
-def delete_supplier_view(request, supplier_id):
-    supplier = get_object_or_404(Supplier, id=supplier_id)
-
-    if request.method == 'POST':
-        supplier.delete()
-        messages.success(request, "Supplier deleted successfully.")
-        return redirect('inventory:supplier_list_view')
-
-    return render(request, 'inventory/delete_supplier_confirm.html', {'supplier': supplier})
 
 
 @login_required
@@ -315,12 +334,103 @@ def supplier_detail_view(request, supplier_id):
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
+def add_supplier_view(request):
+    if request.method == 'POST':
+        form = SupplierForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Supplier added successfully.")
+                return redirect('inventory:supplier_list_view')
+            except Exception as e:
+                user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+                ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+                logger.error(
+                    f"Error adding supplier by user '{user_info}' from IP {ip_address}: {str(e)}",
+                    exc_info=True
+                )
+                messages.error(request, "Something went wrong while adding the supplier.")
+        else:
+            logger.warning(f"Add Supplier form validation failed: {form.errors}")
+            messages.error(request, "Form is invalid. Please correct the errors.")
+    else:
+        form = SupplierForm()
+    
+    return render(request, 'inventory/add_supplier.html', {'form': form})
+    
+    
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def edit_supplier_view(request, supplier_id):
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+
+    if request.method == 'POST':
+        form = SupplierForm(request.POST, request.FILES, instance=supplier)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Supplier updated successfully.")
+                return redirect('inventory:supplier_list_view')
+            except Exception as e:
+                user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+                ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+                logger.error(
+                    f"Error updating supplier {supplier_id} by user '{user_info}' from IP {ip_address}: {str(e)}",
+                    exc_info=True
+                )
+                messages.error(request, "Something went wrong while updating the supplier.")
+        else:
+            logger.warning(f"Edit Supplier form validation failed: {form.errors}")
+            messages.error(request, "Form is invalid. Please correct the errors.")
+    else:
+        form = SupplierForm(instance=supplier)
+
+    return render(request, 'inventory/edit_supplier.html', {
+        'form': form,
+        'supplier': supplier,
+    })
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def delete_supplier_view(request, supplier_id):
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+
+    if request.method == 'POST':
+        try:
+            supplier.delete()
+            messages.success(request, "Supplier deleted successfully.")
+            return redirect('inventory:supplier_list_view')
+        except Exception as e:
+            user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+            ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+            logger.error(
+                f"Error deleting supplier {supplier_id} by user '{user_info}' from IP {ip_address}: {str(e)}",
+                exc_info=True
+            )
+            messages.error(request, "Something went wrong while deleting the supplier.")
+            return redirect('inventory:supplier_list_view')
+
+    return render(request, 'inventory/delete_supplier_confirm.html', {'supplier': supplier})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def toggle_supplier_product(request, sp_id):
     sp = get_object_or_404(SupplierProduct, id=sp_id)
     if request.method == "POST":
-        sp.is_active = not sp.is_active
-        sp.save()
-        messages.success(request, f"Status updated to {'Active' if sp.is_active else 'Inactive'}.")
+        try:
+            sp.is_active = not sp.is_active
+            sp.save()
+            messages.success(request, f"Status updated to {'Active' if sp.is_active else 'Inactive'}.")
+        except Exception as e:
+            user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+            ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+            logger.error(
+                f"Error toggling supplier product {sp_id} by user '{user_info}' from IP {ip_address}: {str(e)}",
+                exc_info=True
+            )
+            messages.error(request, "Something went wrong while updating the product status.")
     return redirect('inventory:supplier_detail_view', supplier_id=sp.supplier_id)
 
 
@@ -332,13 +442,30 @@ def edit_supplier_product(request, pk):
     if request.method == "POST":
         form = SupplierProductForm(request.POST, instance=supplier_product)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Product details updated successfully.")
-            return redirect("inventory:supplier_detail_view", supplier_id=supplier_product.supplier.pk)
+            try:
+                form.save()
+                messages.success(request, "Product details updated successfully.")
+                return redirect("inventory:supplier_detail_view", supplier_id=supplier_product.supplier.pk)
+            except Exception as e:
+                user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+                ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+                logger.error(
+                    f"Error updating supplier product {pk} by user '{user_info}' from IP {ip_address}: {str(e)}",
+                    exc_info=True
+                )
+                messages.error(request, "Something went wrong while updating the product details.")
+        else:
+            logger.warning(f"Edit Supplier Product form validation failed: {form.errors}")
+            messages.error(request, "Form validation failed. Please check your inputs.")
     else:
         form = SupplierProductForm(instance=supplier_product)
 
-    return render(request, "inventory/edit_supplier_product.html", {"form": form, "supplier_product": supplier_product})
+    return render(request, "inventory/edit_supplier_product.html", {
+        "form": form,
+        "supplier_product": supplier_product
+    })
+
+
 
 
 # -------------------
@@ -361,38 +488,52 @@ def stock_update_view(request, product_id):
     if request.method == 'POST':
         form = StockUpdateForm(request.POST)
         if form.is_valid():
-            movement_type = form.cleaned_data['movement_type']
-            new_quantity = form.cleaned_data['quantity']
-            reason = form.cleaned_data['reason']
+            try:
+                movement_type = form.cleaned_data['movement_type']
+                new_quantity = form.cleaned_data['quantity']
+                reason = form.cleaned_data['reason']
 
-            previous_quantity = product.quantity_in_stock
-            quantity_change = new_quantity - previous_quantity
+                previous_quantity = product.quantity_in_stock
+                quantity_change = new_quantity - previous_quantity
 
-            product.quantity_in_stock = new_quantity
-            product.save()
+                product.quantity_in_stock = new_quantity
+                product.save()
 
+                StockMovement.objects.create(
+                    product=product,
+                    movement_type=movement_type,
+                    previous_quantity=previous_quantity,
+                    new_quantity=new_quantity,
+                    quantity_change=quantity_change,
+                    reason=reason,
+                    user=request.user
+                )
 
-            StockMovement.objects.create(
-                product=product,
-                movement_type=movement_type,
-                previous_quantity=previous_quantity,
-                new_quantity=new_quantity,
-                quantity_change=quantity_change,
-                reason=reason,
-                user=request.user
-            )
+                today = timezone.localdate()
+                if product.expiry_date and today <= product.expiry_date <= today + timezone.timedelta(days=get_stock_stats()['near_expiry_days']):
+                    messages.warning(request, f"⏳ {product.name} is Near Expiry on {product.expiry_date}.")
 
-            today = timezone.localdate()
+                check_and_send_inventory_alerts("sknalyami@gmail.com")
 
-            if product.expiry_date and today <= product.expiry_date <= today + timezone.timedelta(days=get_stock_stats()['near_expiry_days']):
-                messages.warning(request, f"⏳ {product.name} is Near Expiry on {product.expiry_date}.")
+                messages.success(request, "Stock quantity updated successfully.")
+                return redirect('inventory:stock_status_view')
 
-            check_and_send_inventory_alerts("sknalyami@gmail.com")
-
-            messages.success(request, "Stock quantity updated successfully.")
-            return redirect('inventory:stock_status_view')
+            except Exception as e:
+                user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+                ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+                logger.error(
+                    f"Error updating stock for product {product_id} by user '{user_info}' from IP {ip_address}: {str(e)}",
+                    exc_info=True
+                )
+                messages.error(request, "Something went wrong while updating the stock.")
+                return redirect('inventory:stock_status_view')
         else:
-            messages.error(request, "Please correct the errors below.")
+            user_info = request.user.username if request.user.is_authenticated else "Anonymous"
+            ip_address = request.META.get('REMOTE_ADDR', 'Unknown IP')
+            logger.warning(
+                f"Stock update form validation failed for product {product_id} by user '{user_info}' from IP {ip_address}: {form.errors}"
+            )
+            messages.error(request, "Form validation failed. Please check your inputs.")
     else:
         form = StockUpdateForm()
 
@@ -401,8 +542,7 @@ def stock_update_view(request, product_id):
         'form': form,
         'low_stock_threshold': LOW_STOCK_THRESHOLD
     })
-    
-    
+
     
 @login_required
 def product_movements_view(request, product_id):
