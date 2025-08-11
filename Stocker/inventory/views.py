@@ -632,29 +632,37 @@ def inventory_reports_view(request):
     return render(request, "inventory/inventory_reports.html", context)
 
 
+
 @login_required
 def supplier_reports_view(request):
     today = timezone.localdate()
+    search_query = request.GET.get("search", "")
+    status = request.GET.get("status")
 
     suppliers_data = []
 
     suppliers = Supplier.objects.all().order_by("name")
 
+    if search_query:
+        suppliers = suppliers.filter(name__icontains=search_query)
+
     for supplier in suppliers:
         products = supplier.products.all().distinct()
 
+        if status == "low":
+            products = products.filter(quantity_in_stock__lt=LOW_STOCK_THRESHOLD, quantity_in_stock__gt=0)
+        elif status == "expired":
+            products = products.filter(expiry_date__isnull=False, expiry_date__lt=today)
+        elif status == "near":
+            products = products.filter(
+                expiry_date__isnull=False,
+                expiry_date__gte=today,
+                expiry_date__lte=today + timedelta(days=NEAR_EXPIRY_DAYS)
+            )
+
         total_products = products.count()
-
-        low_stock_count = products.filter(
-            quantity_in_stock__lt=LOW_STOCK_THRESHOLD,
-            quantity_in_stock__gt=0
-        ).count()
-
-        expired_count = products.filter(
-            expiry_date__isnull=False,
-            expiry_date__lt=today
-        ).count()
-
+        low_stock_count = products.filter(quantity_in_stock__lt=LOW_STOCK_THRESHOLD, quantity_in_stock__gt=0).count()
+        expired_count = products.filter(expiry_date__isnull=False, expiry_date__lt=today).count()
         near_expiry_count = products.filter(
             expiry_date__isnull=False,
             expiry_date__gte=today,
@@ -672,6 +680,10 @@ def supplier_reports_view(request):
     context = {
         "suppliers_data": suppliers_data,
         "low_stock_threshold": LOW_STOCK_THRESHOLD,
-        "near_expiry_days": NEAR_EXPIRY_DAYS
+        "near_expiry_days": NEAR_EXPIRY_DAYS,
+        "selected_status": status,
+        "search_query": search_query
     }
     return render(request, "inventory/supplier_reports.html", context)
+    
+
