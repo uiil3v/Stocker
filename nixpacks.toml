@@ -1,0 +1,16 @@
+# nixpacks.toml
+[phases.setup]
+# مكتبات تشغيل WeasyPrint
+nixPkgs = [
+  "cairo",
+  "pango",
+  "gdk-pixbuf",
+  "glib",         # يوفر libgobject-2.0
+  "harfbuzz",
+  "freetype",
+  "fontconfig",
+  "pkg-config"
+]
+
+# (اختياري) خطوط محسّنة، مفيد لو عندك عربي
+# nixPkgs = [..., "noto-fonts", "noto-fonts-cjk", "noto-fonts-emoji"]
