@@ -6,6 +6,12 @@ app_name = "inventory"
 urlpatterns = [
     
     
+    
+    
+    # Notification
+    path("notifications/", views.notifications_list_view, name="notifications_list_view"),
+    path("notifications/mark-all-read/", views.mark_all_notifications_read_view, name="mark_all_notifications_read_view"),
+    
     # Global Search
     path("search/", views.global_search_view, name="global_search"),
 

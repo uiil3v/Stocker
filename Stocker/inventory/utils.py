@@ -1,6 +1,6 @@
 from datetime import timedelta
 from django.utils import timezone
-from .models import Product, Supplier
+from .models import Product, Supplier, Notification
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -44,6 +44,7 @@ def get_stock_stats():
     }
 
 
+
 def get_supplier_stats():
     today = timezone.localdate()
     suppliers = Supplier.objects.all()
@@ -70,15 +71,18 @@ def get_supplier_stats():
         "suppliers_with_expired": suppliers_with_expired,
         "low_stock_threshold": LOW_STOCK_THRESHOLD
     }
+
+
    
- 
 def check_and_send_inventory_alerts():
     today = timezone.localdate()
 
+    managers = User.objects.filter(is_staff=True)
+    managers_emails = managers.values_list('email', flat=True)
 
-    managers_emails = User.objects.filter(is_staff=True).values_list('email', flat=True)
     if not managers_emails:
         return
+
 
     low_stock_products = Product.objects.filter(
         quantity_in_stock__lt=LOW_STOCK_THRESHOLD,
@@ -93,6 +97,16 @@ def check_and_send_inventory_alerts():
         send_mail(subject, "", settings.DEFAULT_FROM_EMAIL, list(managers_emails),
                   html_message=html_message, fail_silently=False)
 
+ 
+        for manager in managers:
+            Notification.objects.create(
+                title="Low Stock Alert",
+                message=f"There are {low_stock_products.count()} products with low stock.",
+                type="low_stock",
+                user=manager
+            )
+
+
     expired_products = Product.objects.filter(
         expiry_date__isnull=False,
         expiry_date__lt=today
@@ -104,4 +118,14 @@ def check_and_send_inventory_alerts():
             'date': today
         })
         send_mail(subject, "", settings.DEFAULT_FROM_EMAIL, list(managers_emails),
-                  html_message=html_message, fail_silently=False)      
+                  html_message=html_message, fail_silently=False)
+
+
+        for manager in managers:
+            Notification.objects.create(
+                title="Expired Products Alert",
+                message=f"There are {expired_products.count()} expired products.",
+                type="expired",
+                user=manager
+            )        
+        

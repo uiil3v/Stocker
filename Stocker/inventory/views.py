@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from .models import Product, Category, Supplier, SupplierProduct, StockMovement
+from .models import Product, Category, Supplier, SupplierProduct, StockMovement, Notification
 from .forms import ProductForm, CategoryForm, SupplierForm, SupplierProductForm, StockUpdateForm
 from django.db.models import Q, F, Count
 from django.utils import timezone
@@ -53,6 +53,29 @@ def global_search_view(request):
         "suppliers": suppliers
     }
     return render(request, "inventory/global_search.html", context)
+
+
+
+@login_required
+def notifications_list_view(request):
+    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    unread_count = notifications.filter(is_read=False).count()
+
+    context = {
+        "notifications": notifications,
+        "unread_count": unread_count
+    }
+    return render(request, "inventory/notifications_list.html", context)
+
+
+
+@login_required
+def mark_all_notifications_read_view(request):
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    messages.success(request, "All notifications marked as read.")
+    return redirect("inventory:notifications_list_view")
+
+
 
 @login_required
 def dashboard_view(request):

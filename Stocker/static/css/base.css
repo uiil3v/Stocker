@@ -30,6 +30,13 @@ body{
 }
 
 
+.notification-badge {
+    font-size: 0.9rem;       
+    padding: 4px 7px;         
+    line-height: 1;
+}
+
+
 
 .top-side{
     height: 100vh;

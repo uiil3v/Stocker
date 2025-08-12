@@ -66,13 +66,23 @@
 
 
                 <div class="right">
-                    <a href="#" class="text-dark fs-3">
+                    <a href="{% url 'inventory:notifications_list_view' %}" class="text-dark position-relative fs-3">
                         <i class="fas fa-bell"></i>
+                        {% with unread_notifications_count=notifications_unread_count %}
+                            {% if unread_notifications_count > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
+                                    {{ unread_notifications_count }}
+                                </span>
+                            {% endif %}
+                        {% endwith %}
                     </a>
+
                     <a href="#" class="text-dark fs-3 ">
                         <i class="fas fa-user-circle"></i>
                     </a>
                 </div>
+
+
             </div>
             <main class="fade-load" style="flex: 1; overflow-x: hidden;">
                 {% block content %}
