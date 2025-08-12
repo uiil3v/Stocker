@@ -4,6 +4,10 @@ from . import views
 app_name = "inventory"
 
 urlpatterns = [
+    
+    
+    # Global Search
+    path("search/", views.global_search_view, name="global_search"),
 
     # Dashboard
     path('', views.dashboard_view, name='dashboard_view'),

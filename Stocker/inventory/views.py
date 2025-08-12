@@ -26,6 +26,33 @@ def is_admin(user):
     return user.is_superuser
 
 
+@login_required
+def global_search_view(request):
+    search_query = request.GET.get("search") or ""
+
+    products = Product.objects.none()
+    suppliers = Supplier.objects.none()
+
+    if search_query:
+
+        products = Product.objects.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        ).select_related('category').prefetch_related('suppliers')
+
+
+        suppliers = Supplier.objects.filter(
+            Q(name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(phone__icontains=search_query)
+        )
+
+    context = {
+        "search_query": search_query,
+        "products": products,
+        "suppliers": suppliers
+    }
+    return render(request, "inventory/global_search.html", context)
 
 @login_required
 def dashboard_view(request):
@@ -99,6 +126,8 @@ def products_list_view(request):
         "selected_supplier": supplier_id,  
     }
     return render(request, "inventory/products_list.html", context)
+
+
 
 
 @login_required
@@ -455,6 +484,8 @@ def delete_category(request, category_id):
 def supplier_list_view(request):
     suppliers = Supplier.objects.all().order_by('name')
     return render(request, 'inventory/supplier_list.html', {'suppliers': suppliers})
+
+
 
 
 @login_required

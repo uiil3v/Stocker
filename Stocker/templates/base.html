@@ -28,6 +28,7 @@
                 <a href="{% url 'inventory:dashboard_view' %}">
                     <h4>Inventory<i class="fas fa-cubes me-2"></i> Plus</h4>
                 </a>
+                <a href="{% url 'inventory:dashboard_view' %}" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a>
                 <a href="{% url 'inventory:products_list_view' %}" class="nav-link"><i class="fas fa-box"></i><span>Products</span></a>
                 <a href="{% url 'inventory:category_list' %}" class="nav-link"><i class="fas fa-tags"></i><span>Categories</span></a>
                 <a href="{% url 'inventory:supplier_list_view' %}" class="nav-link"><i class="fas fa-truck"></i><span>Suppliers</span></a>
@@ -52,10 +53,12 @@
                         data-bs-target="#sidebarOffcanvas">
                         <i class="fas fa-bars fs-3"></i>
                     </button>
-                    <form action="">
-                        <input type="search" placeholder="Search Products...">
-                        <i style="position: absolute; right: 15px; top: 12px; color: rgb(181, 180, 180);"
-                            class="fa-solid fa-magnifying-glass"></i>
+                    <form method="GET" action="{% url 'inventory:global_search' %}" style="position: relative;">
+                        <input type="search" name="search" placeholder="Search..." class="form-control" 
+                            style="padding-right: 35px;">
+                        <button type="submit" style="background: none; border: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: rgb(181, 180, 180);">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
                     </form>
                 </div>
 
@@ -91,6 +94,7 @@
                     </div>
                     <div class="offcanvas-body d-flex flex-column justify-content-between">
                         <nav class="d-flex flex-column gap-2">
+                            <a href="{% url 'inventory:dashboard_view' %}" class="nav-link fs-4"><i class="fas fa-home me-2"></i> Dashboard</a>
                             <a href="{% url 'inventory:products_list_view' %}" class="nav-link fs-4"><i class="fas fa-box me-2"></i> Products</a>
                             <a href="{% url 'inventory:category_list' %}" class="nav-link fs-4"><i class="fas fa-tags me-2"></i> Categories</a>
                             <a href="{% url 'inventory:supplier_list_view' %}" class="nav-link fs-4"><i class="fas fa-truck me-2"></i> Suppliers</a>
