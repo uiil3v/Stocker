@@ -12,7 +12,6 @@ from .utils import get_stock_stats, LOW_STOCK_THRESHOLD, NEAR_EXPIRY_DAYS, get_s
 import logging
 import csv
 from django.template.loader import render_to_string
-from weasyprint import HTML
 from io import BytesIO
 import io
 import json
@@ -842,6 +841,7 @@ def inventory_reports_view(request):
 
 @login_required
 def inventory_reports_pdf_view(request):
+    from weasyprint import HTML
     today = timezone.localdate()
     category_id = request.GET.get("category")
     status = request.GET.get("status")
@@ -961,6 +961,7 @@ def supplier_reports_view(request):
     
 @login_required
 def supplier_reports_pdf_view(request):
+    from weasyprint import HTML
     today = timezone.localdate()
     search_query = request.GET.get("search", "")
     status = request.GET.get("status")
