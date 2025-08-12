@@ -1,11 +1,11 @@
 # nixpacks.toml
 [phases.setup]
-# مكتبات تشغيل WeasyPrint
 nixPkgs = [
+  "python312",     
   "cairo",
   "pango",
   "gdk-pixbuf",
-  "glib",         # يوفر libgobject-2.0
+  "glib",
   "harfbuzz",
   "freetype",
   "fontconfig",
