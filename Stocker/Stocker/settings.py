@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import cloudinary
 from dotenv import load_dotenv
+import dj_database_url
 
 load_dotenv()
 
@@ -25,8 +26,9 @@ cloudinary.config(
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1",   
-    "http://localhost",   
+    "https://*.up.railway.app",
+    "http://127.0.0.1",
+    "http://localhost",
 ]
 
 CLOUDINARY_STORAGE = {
@@ -48,7 +50,11 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dummy-key-for-dev")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    ".up.railway.app",
+    "localhost",
+    "0.0.0.0",
+]
 
 
 # Application definition
@@ -78,6 +84,8 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 ROOT_URLCONF = "Stocker.urls"
 
 TEMPLATES = [
@@ -105,12 +113,21 @@ WSGI_APPLICATION = "Stocker.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if os.environ.get("DATABASE_URL"):  
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.environ.get("DATABASE_URL"),
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
-}
+else:  
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
@@ -202,3 +219,11 @@ LOGGING = {
         },
     },
 }
+
+
+
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
