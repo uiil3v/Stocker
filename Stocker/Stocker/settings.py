@@ -25,7 +25,10 @@ cloudinary.config(
 )
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
 CSRF_TRUSTED_ORIGINS = [
+    "https://stocker.up.railway.app",
     "https://*.up.railway.app",
     "http://127.0.0.1",
     "http://localhost",
@@ -50,7 +53,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dummy-key-for-dev")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG") == "True"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*", ".up.railway.app", "stocker.up.railway.app"]
 
 
 # Application definition
